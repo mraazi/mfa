@@ -195,7 +195,7 @@
       margin-bottom: 16px;
     }
     @media (min-width: 601px) {
-      .tabs { grid-template-columns: repeat(4, 1fr); }
+      .tabs { grid-template-columns: repeat(5, 1fr); }
     }
     .tab-btn {
       padding: 10px 8px;
@@ -584,6 +584,183 @@
       border-radius: var(--radius);
     }
 
+    /* ───── Direktori Cards ───── */
+    .direktori-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      gap: 12px;
+    }
+    .direktori-header span {
+      color: var(--text-white);
+      font-size: 0.85rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .search-input {
+      flex: 1;
+      max-width: 220px;
+      padding: 8px 12px;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: var(--radius-sm);
+      background: rgba(255,255,255,0.1);
+      color: var(--text-white);
+      font-family: inherit;
+      font-size: 0.85rem;
+    }
+    .search-input::placeholder { color: rgba(255,255,255,0.4); }
+    .penerima-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 12px;
+    }
+    .penerima-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .penerima-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+    .penerima-card .card-photo {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      display: block;
+    }
+    .penerima-card .no-photo {
+      width: 100%;
+      aspect-ratio: 1;
+      background: #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      color: #94a3b8;
+    }
+    .penerima-card .card-info {
+      padding: 10px;
+    }
+    .penerima-card .card-name {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .penerima-card .card-badge {
+      display: inline-block;
+      margin-top: 4px;
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 10px;
+      background: var(--green-light);
+      color: var(--green-dark);
+      font-weight: 500;
+    }
+
+    /* ───── Profile Modal ───── */
+    .profile-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 960;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      cursor: pointer;
+    }
+    .profile-overlay.visible { display: flex; }
+    .profile-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      max-width: 500px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+      cursor: default;
+    }
+    .profile-close {
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      background: rgba(0,0,0,0.4);
+      color: #fff;
+      border: none;
+      font-size: 1.4rem;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .profile-close:hover { background: rgba(0,0,0,0.6); }
+    .profile-photo {
+      width: 100%;
+      max-height: 300px;
+      object-fit: cover;
+      display: block;
+    }
+    .profile-no-photo {
+      width: 100%;
+      height: 160px;
+      background: #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+      color: #94a3b8;
+    }
+    .profile-body { padding: 20px; }
+    .profile-name {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .profile-ic {
+      font-size: 0.85rem;
+      color: var(--text-light);
+      margin-bottom: 16px;
+    }
+    .profile-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .profile-field {}
+    .profile-field.full { grid-column: 1 / -1; }
+    .profile-label {
+      font-size: 0.7rem;
+      color: var(--text-light);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 2px;
+    }
+    .profile-value {
+      font-size: 0.9rem;
+      color: var(--text);
+      font-weight: 500;
+    }
+    .profile-footer {
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px solid var(--card-border);
+      font-size: 0.75rem;
+      color: var(--text-light);
+    }
+
     /* ───── Responsive ───── */
     @media (max-width: 600px) {
       .dashboard { grid-template-columns: repeat(3, 1fr); gap: 8px; }
@@ -651,6 +828,7 @@
       <button class="tab-btn" data-tab="infaq" onclick="switchTab('infaq')">&#128176; Pakej Infaq</button>
       <button class="tab-btn" data-tab="penerima" onclick="switchTab('penerima')">&#128101; Penerima</button>
       <button class="tab-btn" data-tab="agihan" onclick="switchTab('agihan')">&#128230; Agihan</button>
+      <button class="tab-btn" data-tab="direktori" onclick="switchTab('direktori')">&#128209; Direktori</button>
     </div>
 
     <!-- Beras Tab -->
@@ -916,6 +1094,19 @@
       </div>
     </div>
 
+    <!-- Direktori Tab -->
+    <div id="tab-direktori" style="display:none">
+      <div class="direktori-header">
+        <span id="direktoriCount">0 penerima</span>
+        <input type="text" id="direktoriSearch" placeholder="Cari nama..." class="search-input" oninput="renderDirektori()">
+      </div>
+      <div class="penerima-cards" id="direktoriGrid"></div>
+      <div id="direktoriEmpty" class="empty-state" style="display:none">
+        <div class="emoji">&#128209;</div>
+        Belum ada penerima didaftarkan lagi.
+      </div>
+    </div>
+
     <!-- WhatsApp Share -->
     <div class="share-section">
       <button class="btn-whatsapp" onclick="shareWhatsApp()">&#128172; Share WhatsApp</button>
@@ -927,6 +1118,14 @@
   <!-- Photo Modal -->
   <div class="photo-modal-overlay" id="photoModal" onclick="this.classList.remove('visible')">
     <img id="photoModalImg" src="" alt="Gambar penerima">
+  </div>
+
+  <!-- Profile Modal -->
+  <div class="profile-overlay" id="profileModal" onclick="closeProfile()">
+    <div class="profile-card" onclick="event.stopPropagation()">
+      <button class="profile-close" onclick="closeProfile()">&times;</button>
+      <div id="profileContent"></div>
+    </div>
   </div>
 
   <!-- Toast Container -->
@@ -1174,6 +1373,7 @@ function renderAll() {
   renderBerasList();
   renderInfaqList();
   renderPenerimaList();
+  renderDirektori();
   renderAgihanDashboard();
   renderAgihanList();
   renderPenerimaDropdown();
@@ -1355,7 +1555,7 @@ function switchTab(tab) {
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.tab === tab);
   });
-  ['beras', 'infaq', 'penerima', 'agihan'].forEach(t => {
+  ['beras', 'infaq', 'penerima', 'agihan', 'direktori'].forEach(t => {
     document.getElementById('tab-' + t).style.display = t === tab ? 'block' : 'none';
   });
 }
@@ -1650,6 +1850,108 @@ function showPhotoModal(fileId) {
   const modal = document.getElementById('photoModal');
   document.getElementById('photoModalImg').src = 'https://drive.google.com/thumbnail?id=' + fileId + '&sz=w800';
   modal.classList.add('visible');
+}
+
+/* ═══════════════════
+   DIREKTORI
+   ═══════════════════ */
+
+function renderDirektori() {
+  const grid = document.getElementById('direktoriGrid');
+  const empty = document.getElementById('direktoriEmpty');
+  const countEl = document.getElementById('direktoriCount');
+  const query = (document.getElementById('direktoriSearch').value || '').trim().toLowerCase();
+
+  var filtered = APP.penerima;
+  if (query) {
+    filtered = APP.penerima.filter(function(p) {
+      return String(p.nama || '').toLowerCase().indexOf(query) !== -1;
+    });
+  }
+
+  countEl.textContent = filtered.length + ' penerima';
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '';
+    grid.style.display = 'none';
+    empty.style.display = 'block';
+    return;
+  }
+
+  grid.style.display = 'grid';
+  empty.style.display = 'none';
+
+  var html = '';
+  filtered.forEach(function(p, i) {
+    var photoHtml = p.foto
+      ? '<img class="card-photo" src="https://drive.google.com/thumbnail?id=' + escHtml(p.foto) + '&sz=w200" alt="Foto" loading="lazy">'
+      : '<div class="no-photo">&#128100;</div>';
+    var badge = p.jenisbantuan
+      ? '<span class="card-badge">' + escHtml(p.jenisbantuan) + '</span>'
+      : '';
+
+    // Store index in APP.penerima for profile lookup
+    var realIndex = APP.penerima.indexOf(p);
+    html += '<div class="penerima-card" onclick="showProfile(' + realIndex + ')">'
+      + photoHtml
+      + '<div class="card-info">'
+      + '<div class="card-name">' + escHtml(p.nama) + '</div>'
+      + badge
+      + '</div></div>';
+  });
+
+  grid.innerHTML = html;
+}
+
+function showProfile(index) {
+  var p = APP.penerima[index];
+  if (!p) return;
+
+  var photoHtml = p.foto
+    ? '<img class="profile-photo" src="https://drive.google.com/thumbnail?id=' + escHtml(p.foto) + '&sz=w500" alt="Foto">'
+    : '<div class="profile-no-photo">&#128100;</div>';
+
+  var lokasi = '';
+  if (p.lokasi) {
+    lokasi = '<a href="https://www.google.com/maps?q=' + escHtml(p.lokasi) + '" target="_blank" style="color:var(--green);font-weight:500">Lihat Peta</a>';
+  }
+
+  var pendapatan = p.pendapatan ? 'RM' + Number(p.pendapatan).toLocaleString() : '-';
+
+  var ts = p.timestamp ? new Date(p.timestamp) : null;
+  var tarikh = ts ? ts.toLocaleString('ms-MY', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-';
+
+  var html = photoHtml
+    + '<div class="profile-body">'
+    + '<div class="profile-name">' + escHtml(p.nama) + '</div>'
+    + '<div class="profile-ic">IC: ' + escHtml(p.icno || '-') + '</div>'
+    + '<div class="profile-grid">'
+    + field('Alamat', p.alamat, true)
+    + field('No Telefon', p.telefon)
+    + field('Status Pekerjaan', p.statuspekerjaan)
+    + field('Pendapatan', pendapatan)
+    + field('Status Kesihatan', p.statuskesihatan)
+    + field('Bil Anak', p.bilanak)
+    + field('Jenis Bantuan', p.jenisbantuan)
+    + field('Lokasi', lokasi || '-')
+    + field('Catatan', p.catatan, true)
+    + '</div>'
+    + '<div class="profile-footer">Didaftarkan oleh ' + escHtml(p.addedby || '-') + ' &middot; ' + tarikh + '</div>'
+    + '</div>';
+
+  document.getElementById('profileContent').innerHTML = html;
+  document.getElementById('profileModal').classList.add('visible');
+}
+
+function field(label, value, full) {
+  return '<div class="profile-field' + (full ? ' full' : '') + '">'
+    + '<div class="profile-label">' + label + '</div>'
+    + '<div class="profile-value">' + (value || '-') + '</div>'
+    + '</div>';
+}
+
+function closeProfile() {
+  document.getElementById('profileModal').classList.remove('visible');
 }
 
 /* ═══════════════════
