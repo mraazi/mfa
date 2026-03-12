@@ -189,18 +189,21 @@
 
     /* ───── Tabs ───── */
     .tabs {
-      display: flex;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       gap: 4px;
       margin-bottom: 16px;
     }
+    @media (min-width: 601px) {
+      .tabs { grid-template-columns: repeat(4, 1fr); }
+    }
     .tab-btn {
-      flex: 1;
-      padding: 12px;
+      padding: 10px 8px;
       border: none;
       background: rgba(255,255,255,0.06);
       color: var(--text-white);
       font-family: inherit;
-      font-size: 0.9rem;
+      font-size: 0.82rem;
       font-weight: 500;
       cursor: pointer;
       border-radius: var(--radius-sm);
@@ -496,6 +499,91 @@
       cursor: pointer;
     }
 
+    /* ───── Penerima & Agihan ───── */
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 0.9rem;
+      background: #fff;
+    }
+    .form-group textarea { resize: vertical; min-height: 60px; }
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(45,138,78,0.15);
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .form-grid .full-width { grid-column: 1 / -1; }
+    @media (max-width: 600px) {
+      .form-grid { grid-template-columns: 1fr; }
+    }
+    .photo-preview {
+      margin-top: 8px;
+      max-width: 120px;
+      max-height: 120px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--card-border);
+      display: none;
+    }
+    .photo-preview.visible { display: block; }
+    .btn-secondary {
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      border: 1px solid var(--card-border);
+      padding: 10px 16px;
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-secondary:hover { background: #f1f5f9; }
+    .btn-secondary.active { background: var(--green-light); color: var(--green-dark); border-color: var(--green); }
+    .lokasi-status { font-size: 0.8rem; color: var(--green); font-weight: 500; margin-top: 4px; }
+    .photo-thumb {
+      width: 40px;
+      height: 40px;
+      border-radius: 4px;
+      object-fit: cover;
+      cursor: pointer;
+    }
+    .agihan-dashboard {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    @media (min-width: 601px) {
+      .agihan-dashboard { grid-template-columns: repeat(4, 1fr); }
+    }
+    .photo-modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      z-index: 950;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .photo-modal-overlay.visible { display: flex; }
+    .photo-modal-overlay img {
+      max-width: 90vw;
+      max-height: 90vh;
+      border-radius: var(--radius);
+    }
+
     /* ───── Responsive ───── */
     @media (max-width: 600px) {
       .dashboard { grid-template-columns: repeat(3, 1fr); gap: 8px; }
@@ -503,9 +591,10 @@
       .stat-card .value { font-size: 1.4rem; }
       .form-row { flex-direction: column; }
       .form-group { min-width: 100%; }
-      .table-card { font-size: 0.8rem; }
+      .table-card { font-size: 0.8rem; overflow-x: auto; }
       .table-card th, .table-card td { padding: 8px 10px; }
       .action-btns { flex-direction: column; gap: 4px; }
+      .table-card table { min-width: 500px; }
     }
   </style>
 </head>
@@ -560,6 +649,8 @@
     <div class="tabs">
       <button class="tab-btn active" data-tab="beras" onclick="switchTab('beras')">&#127834; Senarai Beras</button>
       <button class="tab-btn" data-tab="infaq" onclick="switchTab('infaq')">&#128176; Pakej Infaq</button>
+      <button class="tab-btn" data-tab="penerima" onclick="switchTab('penerima')">&#128101; Penerima</button>
+      <button class="tab-btn" data-tab="agihan" onclick="switchTab('agihan')">&#128230; Agihan</button>
     </div>
 
     <!-- Beras Tab -->
@@ -569,7 +660,7 @@
         <h3>Tambah / Kemaskini Sumbangan Beras</h3>
         <div class="form-row">
           <div class="form-group">
-            <label>Jumlah Beg</label>
+            <label>Paket Beras</label>
             <input type="number" id="berasBeg" placeholder="cth: 3" inputmode="numeric" min="1" oninput="updateKgPreview()">
           </div>
           <div class="form-group" style="max-width:120px">
@@ -645,12 +736,197 @@
       </div>
     </div>
 
+    <!-- Penerima Tab -->
+    <div id="tab-penerima" style="display:none">
+      <div class="form-card" id="penerimaForm">
+        <h3>Tambah / Kemaskini Penerima Bantuan</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Nama Penerima *</label>
+            <input type="text" id="penNama" placeholder="Nama penuh">
+          </div>
+          <div class="form-group">
+            <label>No IC *</label>
+            <input type="text" id="penIC" placeholder="cth: 880101145678" inputmode="numeric">
+          </div>
+          <div class="form-group full-width">
+            <label>Alamat</label>
+            <textarea id="penAlamat" placeholder="Alamat rumah"></textarea>
+          </div>
+          <div class="form-group">
+            <label>No Telefon</label>
+            <input type="tel" id="penTelefon" placeholder="cth: 0123456789">
+          </div>
+          <div class="form-group">
+            <label>Status Pekerjaan</label>
+            <select id="penPekerjaan">
+              <option value="">-- Pilih --</option>
+              <option value="Bekerja">Bekerja</option>
+              <option value="Tidak Bekerja">Tidak Bekerja</option>
+              <option value="Pesara">Pesara</option>
+              <option value="OKU">OKU</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Pendapatan Bulanan (RM)</label>
+            <input type="number" id="penPendapatan" placeholder="cth: 1500" inputmode="numeric" min="0">
+          </div>
+          <div class="form-group">
+            <label>Status Kesihatan</label>
+            <select id="penKesihatan">
+              <option value="">-- Pilih --</option>
+              <option value="Sihat">Sihat</option>
+              <option value="Sakit Kronik">Sakit Kronik</option>
+              <option value="OKU">OKU</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Bilangan Anak</label>
+            <input type="number" id="penAnak" placeholder="0" inputmode="numeric" min="0">
+          </div>
+          <div class="form-group">
+            <label>Jenis Bantuan</label>
+            <select id="penBantuan">
+              <option value="">-- Pilih --</option>
+              <option value="Beras">Beras</option>
+              <option value="Wang">Wang</option>
+              <option value="Beras+Wang">Beras + Wang</option>
+            </select>
+          </div>
+          <div class="form-group full-width">
+            <label>Catatan</label>
+            <textarea id="penCatatan" placeholder="Maklumat tambahan"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Gambar</label>
+            <input type="file" id="penPhoto" accept="image/*" capture="environment" onchange="handlePhotoCapture(this)" style="font-size:0.85rem">
+            <img id="penPhotoPreview" class="photo-preview" alt="Preview">
+          </div>
+          <div class="form-group">
+            <label>Lokasi GPS</label>
+            <button class="btn-secondary" id="btnLokasi" onclick="captureLocation()" type="button">&#128205; Kongsi Lokasi</button>
+            <div class="lokasi-status" id="lokasiStatus"></div>
+            <input type="hidden" id="penLokasi">
+          </div>
+        </div>
+        <button class="btn-primary" onclick="submitPenerima()" id="btnSubmitPenerima">Hantar</button>
+      </div>
+
+      <div class="table-card">
+        <div id="penerimaLoading" class="loading-overlay"><div class="spinner"></div> Memuatkan data...</div>
+        <table id="penerimaTable" style="display:none">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nama</th>
+              <th>IC</th>
+              <th>Alamat</th>
+              <th>Telefon</th>
+              <th>Bantuan</th>
+              <th>Foto</th>
+              <th>Lokasi</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="penerimaBody"></tbody>
+        </table>
+        <div id="penerimaEmpty" class="empty-state" style="display:none">
+          <div class="emoji">&#128101;</div>
+          Belum ada penerima didaftarkan lagi.
+        </div>
+      </div>
+    </div>
+
+    <!-- Agihan Tab -->
+    <div id="tab-agihan" style="display:none">
+      <!-- Agihan Dashboard -->
+      <div class="agihan-dashboard">
+        <div class="stat-card">
+          <div class="value" id="agBegKutip">0</div>
+          <div class="label">Beg Dikutip</div>
+        </div>
+        <div class="stat-card">
+          <div class="value" id="agBegAgih">0</div>
+          <div class="label">Beg Diagih</div>
+        </div>
+        <div class="stat-card">
+          <div class="value" id="agBegBaki">0</div>
+          <div class="label">Baki Beg</div>
+        </div>
+        <div class="stat-card">
+          <div class="value" id="agPenerima">0</div>
+          <div class="label">Penerima</div>
+        </div>
+      </div>
+
+      <!-- Agihan Progress -->
+      <div class="progress-card">
+        <div class="progress-header">
+          <span class="progress-title">Agihan Beras</span>
+          <span class="progress-amount"><strong id="agAgihCount">0</strong> / <span id="agKutipCount">0</span> beg</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" id="agBar" style="width: 0%"></div>
+        </div>
+        <div class="progress-pct" id="agPct">0%</div>
+      </div>
+
+      <!-- Agihan Form -->
+      <div class="form-card" id="agihanForm">
+        <h3>Rekod Agihan Beras</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nama Penerima</label>
+            <select id="agNamaPenerima" style="width:100%;padding:10px 12px;border:1px solid var(--card-border);border-radius:var(--radius-sm);font-family:inherit;font-size:0.9rem;background:#fff;">
+              <option value="">-- Pilih Penerima --</option>
+            </select>
+          </div>
+          <div class="form-group" style="max-width:120px">
+            <label>Bilangan Beg</label>
+            <input type="number" id="agBeg" placeholder="cth: 2" inputmode="numeric" min="1">
+          </div>
+          <div class="form-group">
+            <label>Catatan</label>
+            <input type="text" id="agCatatan" placeholder="(pilihan)">
+          </div>
+          <button class="btn-primary" onclick="submitAgihan()" id="btnSubmitAgihan">Hantar</button>
+        </div>
+      </div>
+
+      <!-- Agihan Table -->
+      <div class="table-card">
+        <div id="agihanLoading" class="loading-overlay"><div class="spinner"></div> Memuatkan data...</div>
+        <table id="agihanTable" style="display:none">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nama Penerima</th>
+              <th>Beg</th>
+              <th>Diagih Oleh</th>
+              <th>Masa</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="agihanBody"></tbody>
+        </table>
+        <div id="agihanEmpty" class="empty-state" style="display:none">
+          <div class="emoji">&#128230;</div>
+          Belum ada agihan direkodkan lagi.
+        </div>
+      </div>
+    </div>
+
     <!-- WhatsApp Share -->
     <div class="share-section">
       <button class="btn-whatsapp" onclick="shareWhatsApp()">&#128172; Share WhatsApp</button>
       <button class="btn-copy" id="btnCopy" onclick="copyToClipboard()">&#128203; Salin Teks</button>
     </div>
 
+  </div>
+
+  <!-- Photo Modal -->
+  <div class="photo-modal-overlay" id="photoModal" onclick="this.classList.remove('visible')">
+    <img id="photoModalImg" src="" alt="Gambar penerima">
   </div>
 
   <!-- Toast Container -->
@@ -672,7 +948,7 @@
 /* ════════════════════════════════════════════════════════
    KONFIGURASI — Tukar API_URL dengan deployment URL anda
    ════════════════════════════════════════════════════════ */
-const API_URL = 'https://script.google.com/macros/s/AKfycbwphzYaZSQbhTsx2A3k1dhMr48o_Q01I3FewHxzY6FmPeJaIFbOk71XsM1lBll9sbQ3jA/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbzfZUNXtdIgam_UszeGvxcZaixrco-EI1G7SBaY3c8g48QSpjrPecUTsWdk1Dy-UtYzUw/exec';
 
 /* ───── State ───── */
 const APP = {
@@ -680,9 +956,13 @@ const APP = {
   beras: [],
   infaq: [],
   ahli: [],
+  penerima: [],
+  agihan: [],
   config: { infaq_target: 4000 },
   activeTab: 'beras',
-  loading: true
+  loading: true,
+  pendingPhoto: null,
+  pendingLokasi: ''
 };
 
 /* ═══════════════════
@@ -698,6 +978,8 @@ async function fetchAllData() {
     APP.beras = data.beras || [];
     APP.infaq = data.infaq || [];
     APP.ahli = data.ahli || [];
+    APP.penerima = data.penerima || [];
+    APP.agihan = data.agihan || [];
     if (data.config && data.config.infaq_target) {
       APP.config.infaq_target = Number(data.config.infaq_target);
     }
@@ -891,6 +1173,10 @@ function renderAll() {
   renderDashboard();
   renderBerasList();
   renderInfaqList();
+  renderPenerimaList();
+  renderAgihanDashboard();
+  renderAgihanList();
+  renderPenerimaDropdown();
   renderForms();
 }
 
@@ -1050,16 +1336,14 @@ function renderInfaqList() {
 }
 
 function renderForms() {
-  const berasForm = document.getElementById('berasForm');
-  const infaqForm = document.getElementById('infaqForm');
-
-  if (APP.currentUser) {
-    berasForm.classList.add('visible');
-    infaqForm.classList.add('visible');
-  } else {
-    berasForm.classList.remove('visible');
-    infaqForm.classList.remove('visible');
-  }
+  const forms = ['berasForm', 'infaqForm', 'penerimaForm', 'agihanForm'];
+  forms.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      if (APP.currentUser) el.classList.add('visible');
+      else el.classList.remove('visible');
+    }
+  });
 }
 
 /* ═══════════════════
@@ -1071,8 +1355,9 @@ function switchTab(tab) {
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.tab === tab);
   });
-  document.getElementById('tab-beras').style.display = tab === 'beras' ? 'block' : 'none';
-  document.getElementById('tab-infaq').style.display = tab === 'infaq' ? 'block' : 'none';
+  ['beras', 'infaq', 'penerima', 'agihan'].forEach(t => {
+    document.getElementById('tab-' + t).style.display = t === tab ? 'block' : 'none';
+  });
 }
 
 /* ═══════════════════
@@ -1082,6 +1367,33 @@ function switchTab(tab) {
 function generateWhatsAppText() {
   const lines = [];
 
+  if (APP.activeTab === 'penerima') {
+    lines.push('*Senarai Penerima Bantuan Ramadhan 1447H* 📋');
+    lines.push('');
+    APP.penerima.forEach((p, i) => {
+      lines.push((i + 1) + ') ' + p.nama + (p.jenisbantuan ? ' (' + p.jenisbantuan + ')' : ''));
+    });
+    lines.push('');
+    lines.push('*Jumlah penerima: ' + APP.penerima.length + ' orang*');
+    return lines.join('\n');
+  }
+
+  if (APP.activeTab === 'agihan') {
+    const begKutip = APP.beras.reduce((s, b) => s + Number(b.beg || 0), 0);
+    const begAgih = APP.agihan.reduce((s, a) => s + Number(a.begdiagih || 0), 0);
+    lines.push('*Rekod Agihan Beras Ramadhan 1447H* 📦');
+    lines.push('');
+    APP.agihan.forEach((a, i) => {
+      lines.push((i + 1) + ') ' + a.namapenerima + ' - ' + a.begdiagih + ' beg');
+    });
+    lines.push('');
+    lines.push('*Diagihkan: ' + begAgih + '/' + begKutip + ' beg*');
+    const baki = begKutip - begAgih;
+    if (baki > 0) lines.push('Baki: ' + baki + ' beg');
+    return lines.join('\n');
+  }
+
+  // Default: beras + infaq
   lines.push('*Senarai Pemberian Zakat Fitrah MFA Ramadhan 1447H* 🍚🍛');
   lines.push('');
 
@@ -1155,6 +1467,327 @@ async function copyToClipboard() {
 }
 
 /* ═══════════════════
+   PENERIMA
+   ═══════════════════ */
+
+function handlePhotoCapture(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      const maxSize = 800;
+      let w = img.width, h = img.height;
+      if (w > maxSize || h > maxSize) {
+        if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+        else { w = Math.round(w * maxSize / h); h = maxSize; }
+      }
+      canvas.width = w;
+      canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+      APP.pendingPhoto = dataUrl.split(',')[1]; // base64 only
+      const preview = document.getElementById('penPhotoPreview');
+      preview.src = dataUrl;
+      preview.classList.add('visible');
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function captureLocation() {
+  const btn = document.getElementById('btnLokasi');
+  const status = document.getElementById('lokasiStatus');
+  if (!navigator.geolocation) {
+    status.textContent = 'Pelayar tidak menyokong GPS';
+    return;
+  }
+  btn.disabled = true;
+  status.textContent = 'Mendapatkan lokasi...';
+  navigator.geolocation.getCurrentPosition(
+    function(pos) {
+      const loc = pos.coords.latitude.toFixed(6) + ',' + pos.coords.longitude.toFixed(6);
+      APP.pendingLokasi = loc;
+      document.getElementById('penLokasi').value = loc;
+      status.innerHTML = '&#10003; Lokasi diambil — <a href="https://www.google.com/maps?q=' + loc + '" target="_blank" style="color:var(--green)">Lihat Peta</a>';
+      btn.disabled = false;
+      btn.classList.add('active');
+    },
+    function(err) {
+      status.textContent = 'Gagal: ' + err.message;
+      btn.disabled = false;
+    },
+    { enableHighAccuracy: true, timeout: 10000 }
+  );
+}
+
+async function submitPenerima() {
+  if (!APP.currentUser) return;
+  const nama = document.getElementById('penNama').value.trim();
+  const icno = document.getElementById('penIC').value.trim();
+  if (!nama || !icno) {
+    showToast('Nama dan No IC diperlukan.', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('btnSubmitPenerima');
+  btn.disabled = true;
+  btn.textContent = 'Menghantar...';
+
+  let fotoId = '';
+
+  // Upload photo first if exists
+  if (APP.pendingPhoto) {
+    showToast('Memuat naik gambar...', 'success');
+    const photoResult = await postData({
+      action: 'uploadPhoto',
+      base64: APP.pendingPhoto,
+      filename: 'penerima_' + icno + '_' + Date.now() + '.jpg'
+    });
+    if (photoResult && photoResult.fileId) {
+      fotoId = photoResult.fileId;
+    }
+  }
+
+  const result = await postData({
+    action: 'addPenerima',
+    nama: nama,
+    icno: icno,
+    alamat: document.getElementById('penAlamat').value.trim(),
+    telefon: document.getElementById('penTelefon').value.trim(),
+    statuspekerjaan: document.getElementById('penPekerjaan').value,
+    pendapatan: document.getElementById('penPendapatan').value,
+    statuskesihatan: document.getElementById('penKesihatan').value,
+    bilanak: document.getElementById('penAnak').value,
+    jenisbantuan: document.getElementById('penBantuan').value,
+    catatan: document.getElementById('penCatatan').value.trim(),
+    foto: fotoId,
+    lokasi: document.getElementById('penLokasi').value,
+    addedby: APP.currentUser
+  });
+
+  btn.disabled = false;
+  btn.textContent = 'Hantar';
+
+  if (result && result.success) {
+    showToast('Penerima berjaya didaftarkan!', 'success');
+    // Reset form
+    ['penNama','penIC','penAlamat','penTelefon','penPendapatan','penAnak','penCatatan'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    ['penPekerjaan','penKesihatan','penBantuan'].forEach(id => {
+      document.getElementById(id).selectedIndex = 0;
+    });
+    document.getElementById('penPhoto').value = '';
+    document.getElementById('penPhotoPreview').classList.remove('visible');
+    document.getElementById('penLokasi').value = '';
+    document.getElementById('lokasiStatus').textContent = '';
+    document.getElementById('btnLokasi').classList.remove('active');
+    APP.pendingPhoto = null;
+    APP.pendingLokasi = '';
+    await fetchAllData();
+  }
+}
+
+async function deletePenerima(icno) {
+  if (!confirm('Padam penerima dengan IC: ' + icno + '?')) return;
+  const result = await postData({ action: 'deletePenerima', icno: icno });
+  if (result && result.success) {
+    showToast('Penerima dipadam.', 'success');
+    await fetchAllData();
+  }
+}
+
+function renderPenerimaList() {
+  const tbody = document.getElementById('penerimaBody');
+  const table = document.getElementById('penerimaTable');
+  const empty = document.getElementById('penerimaEmpty');
+
+  if (APP.penerima.length === 0) {
+    table.style.display = 'none';
+    empty.style.display = 'block';
+    return;
+  }
+
+  table.style.display = 'table';
+  empty.style.display = 'none';
+
+  let html = '';
+  APP.penerima.forEach((p, i) => {
+    const fotoCell = p.foto
+      ? '<img class="photo-thumb" src="https://drive.google.com/thumbnail?id=' + escHtml(p.foto) + '&sz=w80" onclick="showPhotoModal(\'' + escHtml(p.foto) + '\')" alt="Foto">'
+      : '-';
+    const lokasi = p.lokasi
+      ? '<a href="https://www.google.com/maps?q=' + escHtml(p.lokasi) + '" target="_blank" style="color:var(--green);font-size:0.8rem">Lihat Peta</a>'
+      : '-';
+
+    let actions = '';
+    if (APP.currentUser && APP.currentUser.toLowerCase() === String(p.addedby || '').toLowerCase()) {
+      actions = '<button class="btn-icon delete" onclick="deletePenerima(\'' + escHtml(p.icno) + '\')">Padam</button>';
+    }
+
+    html += '<tr>'
+      + '<td>' + (i + 1) + '</td>'
+      + '<td><strong>' + escHtml(p.nama) + '</strong></td>'
+      + '<td>' + escHtml(p.icno) + '</td>'
+      + '<td>' + escHtml(p.alamat || '-') + '</td>'
+      + '<td>' + escHtml(p.telefon || '-') + '</td>'
+      + '<td>' + escHtml(p.jenisbantuan || '-') + '</td>'
+      + '<td>' + fotoCell + '</td>'
+      + '<td>' + lokasi + '</td>'
+      + '<td><div class="action-btns">' + actions + '</div></td>'
+      + '</tr>';
+  });
+
+  tbody.innerHTML = html;
+}
+
+function showPhotoModal(fileId) {
+  const modal = document.getElementById('photoModal');
+  document.getElementById('photoModalImg').src = 'https://drive.google.com/thumbnail?id=' + fileId + '&sz=w800';
+  modal.classList.add('visible');
+}
+
+/* ═══════════════════
+   AGIHAN
+   ═══════════════════ */
+
+function renderPenerimaDropdown() {
+  const sel = document.getElementById('agNamaPenerima');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">-- Pilih Penerima --</option>';
+  APP.penerima.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p.nama;
+    opt.textContent = p.nama;
+    sel.appendChild(opt);
+  });
+}
+
+function renderAgihanDashboard() {
+  const begKutip = APP.beras.reduce((s, b) => s + Number(b.beg || 0), 0);
+  const begAgih = APP.agihan.reduce((s, a) => s + Number(a.begdiagih || 0), 0);
+  const baki = begKutip - begAgih;
+  const uniquePenerima = new Set(APP.agihan.map(a => String(a.namapenerima).toLowerCase())).size;
+
+  document.getElementById('agBegKutip').textContent = begKutip;
+  document.getElementById('agBegAgih').textContent = begAgih;
+  document.getElementById('agBegBaki').textContent = Math.max(0, baki);
+  document.getElementById('agPenerima').textContent = uniquePenerima;
+
+  // Progress bar
+  const pct = begKutip > 0 ? Math.min(100, Math.round((begAgih / begKutip) * 100)) : 0;
+  document.getElementById('agAgihCount').textContent = begAgih;
+  document.getElementById('agKutipCount').textContent = begKutip;
+  document.getElementById('agBar').style.width = pct + '%';
+  document.getElementById('agPct').textContent = pct + '% diagihkan';
+}
+
+function renderAgihanList() {
+  const tbody = document.getElementById('agihanBody');
+  const table = document.getElementById('agihanTable');
+  const empty = document.getElementById('agihanEmpty');
+
+  if (APP.agihan.length === 0) {
+    table.style.display = 'none';
+    empty.style.display = 'block';
+    return;
+  }
+
+  table.style.display = 'table';
+  empty.style.display = 'none';
+
+  // Sort by timestamp newest first
+  const sorted = [...APP.agihan].sort((a, b) => {
+    return new Date(b.timestamp) - new Date(a.timestamp);
+  });
+
+  let html = '';
+  let totalBeg = 0;
+
+  sorted.forEach((a, i) => {
+    const beg = Number(a.begdiagih || 0);
+    totalBeg += beg;
+
+    const ts = a.timestamp ? new Date(a.timestamp) : null;
+    const masa = ts ? ts.toLocaleString('ms-MY', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-';
+
+    let actions = '';
+    if (APP.currentUser && APP.currentUser.toLowerCase() === String(a.diagiholeh || '').toLowerCase()) {
+      actions = '<button class="btn-icon delete" onclick="deleteAgihan(\'' + escHtml(a.namapenerima) + '\',\'' + escHtml(String(a.timestamp)) + '\')">Padam</button>';
+    }
+
+    html += '<tr>'
+      + '<td>' + (i + 1) + '</td>'
+      + '<td><strong>' + escHtml(a.namapenerima) + '</strong></td>'
+      + '<td>' + beg + ' beg</td>'
+      + '<td>' + escHtml(a.diagiholeh || '-') + '</td>'
+      + '<td>' + masa + '</td>'
+      + '<td><div class="action-btns">' + actions + '</div></td>'
+      + '</tr>';
+  });
+
+  // Total row
+  html += '<tr class="total-row">'
+    + '<td></td><td>JUMLAH</td>'
+    + '<td>' + totalBeg + ' beg</td>'
+    + '<td></td><td></td><td></td>'
+    + '</tr>';
+
+  tbody.innerHTML = html;
+}
+
+async function submitAgihan() {
+  if (!APP.currentUser) return;
+  const namaPenerima = document.getElementById('agNamaPenerima').value;
+  const beg = Number(document.getElementById('agBeg').value);
+  if (!namaPenerima) {
+    showToast('Sila pilih nama penerima.', 'error');
+    return;
+  }
+  if (!beg || beg <= 0) {
+    showToast('Sila masukkan bilangan beg yang sah.', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('btnSubmitAgihan');
+  btn.disabled = true;
+  btn.textContent = 'Menghantar...';
+
+  const result = await postData({
+    action: 'addAgihan',
+    namapenerima: namaPenerima,
+    beg: beg,
+    diagiholeh: APP.currentUser,
+    catatan: document.getElementById('agCatatan').value.trim()
+  });
+
+  btn.disabled = false;
+  btn.textContent = 'Hantar';
+
+  if (result && result.success) {
+    showToast('Agihan berjaya direkodkan!', 'success');
+    document.getElementById('agNamaPenerima').selectedIndex = 0;
+    document.getElementById('agBeg').value = '';
+    document.getElementById('agCatatan').value = '';
+    await fetchAllData();
+  }
+}
+
+async function deleteAgihan(namaPenerima, timestamp) {
+  if (!confirm('Padam rekod agihan untuk "' + namaPenerima + '"?')) return;
+  const result = await postData({ action: 'deleteAgihan', namapenerima: namaPenerima, timestamp: timestamp });
+  if (result && result.success) {
+    showToast('Rekod agihan dipadam.', 'success');
+    await fetchAllData();
+  }
+}
+
+/* ═══════════════════
    HELPERS
    ═══════════════════ */
 
@@ -1166,8 +1799,9 @@ function updateKgPreview() {
 }
 
 function showLoading(show) {
-  ['berasLoading', 'infaqLoading'].forEach(id => {
-    document.getElementById(id).style.display = show ? 'flex' : 'none';
+  ['berasLoading', 'infaqLoading', 'penerimaLoading', 'agihanLoading'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = show ? 'flex' : 'none';
   });
 }
 
