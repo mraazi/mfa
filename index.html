@@ -949,7 +949,12 @@
           </div>
           <div class="form-group">
             <label>Gambar</label>
-            <input type="file" id="penPhoto" accept="image/*" onchange="handlePhotoCapture(this)" style="font-size:0.85rem">
+            <div style="display:flex;gap:8px;margin-bottom:6px">
+              <button type="button" class="btn-secondary" onclick="document.getElementById('penPhotoCamera').click()" style="flex:1">&#128247; Kamera</button>
+              <button type="button" class="btn-secondary" onclick="document.getElementById('penPhotoGallery').click()" style="flex:1">&#128444; Galeri</button>
+            </div>
+            <input type="file" id="penPhotoCamera" accept="image/*" capture="environment" onchange="handlePhotoCapture(this)" style="display:none">
+            <input type="file" id="penPhotoGallery" accept="image/*" onchange="handlePhotoCapture(this)" style="display:none">
             <img id="penPhotoPreview" class="photo-preview" alt="Preview">
           </div>
           <div class="form-group">
@@ -1738,7 +1743,8 @@ async function submitPenerima() {
     ['penPekerjaan','penKesihatan','penBantuan'].forEach(id => {
       document.getElementById(id).selectedIndex = 0;
     });
-    document.getElementById('penPhoto').value = '';
+    document.getElementById('penPhotoCamera').value = '';
+    document.getElementById('penPhotoGallery').value = '';
     document.getElementById('penPhotoPreview').classList.remove('visible');
     document.getElementById('penLokasi').value = '';
     document.getElementById('lokasiStatus').textContent = '';
@@ -1866,7 +1872,7 @@ function showProfile(index) {
   if (!p) return;
 
   var photoHtml = p.foto
-    ? '<img class="profile-photo" src="https://lh3.googleusercontent.com/d/' + escHtml(p.foto) + '=s500" alt="Foto">'
+    ? '<img class="profile-photo" src="' + fotoSrc(p.foto, 500) + '" alt="Foto">'
     : '<div class="profile-no-photo">&#128100;</div>';
 
   var lokasi = '';
