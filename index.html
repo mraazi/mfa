@@ -362,13 +362,7 @@
     .btn-icon.confirm:hover { background: var(--green-light); }
 
     /* ───── WhatsApp Share ───── */
-    .share-section {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
     .btn-whatsapp {
-      flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -385,29 +379,7 @@
       transition: background 0.2s;
     }
     .btn-whatsapp:hover { background: #1da851; }
-    .btn-copy {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 12px;
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: var(--radius-sm);
-      background: rgba(255,255,255,0.06);
-      color: var(--text-white);
-      font-family: inherit;
-      font-size: 0.85rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .btn-copy:hover { background: rgba(255,255,255,0.12); }
-    .btn-copy.copied {
-      background: var(--green);
-      border-color: var(--green);
-      color: #fff;
-    }
+
 
     /* ───── Toast ───── */
     .toast-container {
@@ -876,6 +848,7 @@
           Belum ada sumbangan beras lagi.<br>Jadi orang pertama!
         </div>
       </div>
+      <button class="btn-whatsapp" onclick="shareWhatsApp()" style="width:100%;margin-top:12px">&#128172; Share WhatsApp</button>
     </div>
 
     <!-- Infaq Tab -->
@@ -1104,12 +1077,6 @@
         <div class="emoji">&#128209;</div>
         Belum ada penerima didaftarkan lagi.
       </div>
-    </div>
-
-    <!-- WhatsApp Share -->
-    <div class="share-section">
-      <button class="btn-whatsapp" onclick="shareWhatsApp()">&#128172; Share WhatsApp</button>
-      <button class="btn-copy" id="btnCopy" onclick="copyToClipboard()">&#128203; Salin Teks</button>
     </div>
 
   </div>
@@ -1662,33 +1629,6 @@ function shareWhatsApp() {
   window.open('https://wa.me/?text=' + encoded, '_blank');
 }
 
-async function copyToClipboard() {
-  const text = generateWhatsAppText();
-  const btn = document.getElementById('btnCopy');
-  try {
-    await navigator.clipboard.writeText(text);
-    btn.classList.add('copied');
-    btn.innerHTML = '&#10003; Disalin!';
-    setTimeout(() => {
-      btn.classList.remove('copied');
-      btn.innerHTML = '&#128203; Salin Teks';
-    }, 2000);
-  } catch (err) {
-    // Fallback
-    const ta = document.createElement('textarea');
-    ta.value = text;
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
-    btn.classList.add('copied');
-    btn.innerHTML = '&#10003; Disalin!';
-    setTimeout(() => {
-      btn.classList.remove('copied');
-      btn.innerHTML = '&#128203; Salin Teks';
-    }, 2000);
-  }
-}
 
 /* ═══════════════════
    PENERIMA
@@ -1960,7 +1900,10 @@ function showProfile(index) {
     + field('Lokasi', lokasi || '-')
     + field('Catatan', p.catatan, true)
     + '</div>'
-    + '<div class="profile-footer">Didaftarkan oleh ' + escHtml(p.addedby || '-') + ' &middot; ' + tarikh + '</div>'
+    + '<div class="profile-footer">'
+    + '<span>Didaftarkan oleh ' + escHtml(p.addedby || '-') + ' &middot; ' + tarikh + '</span>'
+    + '<button class="btn-primary" onclick="editPenerima(' + index + ')" style="float:right;padding:6px 16px;font-size:0.8rem">Edit</button>'
+    + '</div>'
     + '</div>';
 
   document.getElementById('profileContent').innerHTML = html;
@@ -1976,6 +1919,50 @@ function field(label, value, full) {
 
 function closeProfile() {
   document.getElementById('profileModal').classList.remove('visible');
+}
+
+function editPenerima(index) {
+  var p = APP.penerima[index];
+  if (!p) return;
+
+  closeProfile();
+  switchTab('penerima');
+
+  // Pre-fill form fields
+  document.getElementById('penNama').value = p.nama || '';
+  document.getElementById('penIC').value = p.icno || '';
+  document.getElementById('penAlamat').value = p.alamat || '';
+  document.getElementById('penTelefon').value = p.telefon || '';
+  document.getElementById('penPendapatan').value = p.pendapatan || '';
+  document.getElementById('penAnak').value = p.bilanak || '';
+  document.getElementById('penCatatan').value = p.catatan || '';
+  document.getElementById('penLokasi').value = p.lokasi || '';
+
+  // Set select dropdowns
+  setSelectValue('penPekerjaan', p.statuspekerjaan || '');
+  setSelectValue('penKesihatan', p.statuskesihatan || '');
+  setSelectValue('penBantuan', p.jenisbantuan || '');
+
+  // Show lokasi status if exists
+  if (p.lokasi) {
+    APP.pendingLokasi = p.lokasi;
+    document.getElementById('lokasiStatus').innerHTML = '&#10003; Lokasi sedia ada — <a href="https://www.google.com/maps?q=' + escHtml(p.lokasi) + '" target="_blank" style="color:var(--green)">Lihat Peta</a>';
+    document.getElementById('btnLokasi').classList.add('active');
+  }
+
+  // Scroll to form
+  document.getElementById('penerimaForm').scrollIntoView({ behavior: 'smooth' });
+}
+
+function setSelectValue(id, value) {
+  var sel = document.getElementById(id);
+  for (var i = 0; i < sel.options.length; i++) {
+    if (sel.options[i].value === value) {
+      sel.selectedIndex = i;
+      return;
+    }
+  }
+  sel.selectedIndex = 0;
 }
 
 /* ═══════════════════
