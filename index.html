@@ -949,7 +949,7 @@
           </div>
           <div class="form-group">
             <label>Gambar</label>
-            <input type="file" id="penPhoto" accept="image/*" capture="environment" onchange="handlePhotoCapture(this)" style="font-size:0.85rem">
+            <input type="file" id="penPhoto" accept="image/*" onchange="handlePhotoCapture(this)" style="font-size:0.85rem">
             <img id="penPhotoPreview" class="photo-preview" alt="Preview">
           </div>
           <div class="form-group">
@@ -1132,7 +1132,7 @@
 /* ════════════════════════════════════════════════════════
    KONFIGURASI — Tukar API_URL dengan deployment URL anda
    ════════════════════════════════════════════════════════ */
-const API_URL = 'https://script.google.com/macros/s/AKfycbzfZUNXtdIgam_UszeGvxcZaixrco-EI1G7SBaY3c8g48QSpjrPecUTsWdk1Dy-UtYzUw/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbyuR0ktt09QDZ3tsWhIPaCm7h4vvm3jIlAlbYCkJZYXqa4KDQCd96npQdkyvjdk53Hryw/exec';
 
 /* ───── State ───── */
 const APP = {
@@ -1195,26 +1195,7 @@ async function postData(payload) {
   }
 }
 
-// POST for large payloads (e.g. photo upload base64)
-// Google Apps Script requires text/plain to avoid CORS preflight
-async function postDataLarge(payload) {
-  try {
-    const res = await fetch(API_URL, {
-      method: 'POST',
-      body: JSON.stringify(payload)
-    });
-    const data = await res.json();
-    if (data.error) {
-      showToast(data.error, 'error');
-      return null;
-    }
-    return data;
-  } catch (err) {
-    console.error('POST error:', err);
-    showToast('Ralat muat naik gambar.', 'error');
-    return null;
-  }
-}
+
 
 /* ═══════════════════
    LOGIN
@@ -1664,7 +1645,7 @@ function handlePhotoCapture(input) {
     const img = new Image();
     img.onload = function() {
       const canvas = document.createElement('canvas');
-      const maxSize = 400;
+      const maxSize = 200;
       let w = img.width, h = img.height;
       if (w > maxSize || h > maxSize) {
         if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
@@ -1673,7 +1654,7 @@ function handlePhotoCapture(input) {
       canvas.width = w;
       canvas.height = h;
       canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.4);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.3);
       APP.pendingPhoto = dataUrl.split(',')[1]; // base64 only
       const preview = document.getElementById('penPhotoPreview');
       preview.src = dataUrl;
@@ -1727,29 +1708,7 @@ async function submitPenerima() {
   var existing = APP.penerima.find(function(p) { return String(p.icno) === String(icno); });
   let fotoId = (existing && existing.foto) ? existing.foto : '';
 
-  // Upload photo first if exists
-  if (APP.pendingPhoto) {
-    showToast('Memuat naik gambar...', 'success');
-    var uploadPayload = {
-      action: 'uploadPhoto',
-      base64: APP.pendingPhoto,
-      filename: 'penerima_' + icno + '_' + Date.now() + '.jpg'
-    };
-    // Try GET if small enough, otherwise POST
-    var encoded = encodeURIComponent(JSON.stringify(uploadPayload));
-    var photoResult;
-    if (encoded.length < 7000) {
-      photoResult = await postData(uploadPayload);
-    } else {
-      photoResult = await postDataLarge(uploadPayload);
-    }
-    if (photoResult && photoResult.fileId) {
-      fotoId = photoResult.fileId;
-    } else {
-      showToast('Gambar gagal dimuat naik. Data lain tetap disimpan.', 'error');
-    }
-  }
-
+  // Save penerima data first (without new foto)
   const result = await postData({
     action: 'addPenerima',
     nama: nama,
@@ -1766,6 +1725,20 @@ async function submitPenerima() {
     lokasi: document.getElementById('penLokasi').value,
     addedby: APP.currentUser
   });
+
+  // Upload photo after saving data — backend links it to penerima row via icno
+  if (APP.pendingPhoto && result && result.success) {
+    showToast('Memuat naik gambar...', 'success');
+    var photoResult = await postData({
+      action: 'uploadPhoto',
+      base64: APP.pendingPhoto,
+      filename: 'penerima_' + icno + '_' + Date.now() + '.jpg',
+      icno: icno
+    });
+    if (!photoResult || !photoResult.success) {
+      showToast('Gambar gagal dimuat naik. Cuba saiz lebih kecil.', 'error');
+    }
+  }
 
   btn.disabled = false;
   btn.textContent = 'Hantar';
