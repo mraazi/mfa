@@ -569,19 +569,19 @@
         <h3>Tambah / Kemaskini Sumbangan Beras</h3>
         <div class="form-row">
           <div class="form-group">
-            <label>Berat (KG)</label>
-            <input type="number" id="berasKg" placeholder="cth: 20" inputmode="numeric" min="1" oninput="updateBegPreview()">
+            <label>Jumlah Beg</label>
+            <input type="number" id="berasBeg" placeholder="cth: 3" inputmode="numeric" min="1" oninput="updateKgPreview()">
           </div>
           <div class="form-group" style="max-width:120px">
             <label>Saiz Paket</label>
-            <select id="berasSaiz" onchange="updateBegPreview()" style="width:100%;padding:10px 12px;border:1px solid var(--card-border);border-radius:var(--radius-sm);font-family:inherit;font-size:0.9rem;background:#fff;">
+            <select id="berasSaiz" onchange="updateKgPreview()" style="width:100%;padding:10px 12px;border:1px solid var(--card-border);border-radius:var(--radius-sm);font-family:inherit;font-size:0.9rem;background:#fff;">
               <option value="5" selected>5 kg</option>
               <option value="1">1 kg</option>
               <option value="2">2 kg</option>
               <option value="10">10 kg</option>
             </select>
           </div>
-          <div class="form-preview" id="begPreview">= 0 beg</div>
+          <div class="form-preview" id="kgPreview">= 0 kg</div>
           <button class="btn-primary" onclick="submitBeras()" id="btnSubmitBeras">Hantar</button>
         </div>
       </div>
@@ -594,9 +594,9 @@
             <tr>
               <th>#</th>
               <th>Nama</th>
-              <th>KG</th>
-              <th>Saiz</th>
               <th>Beg</th>
+              <th>Saiz</th>
+              <th>Jumlah KG</th>
               <th>Status</th>
               <th></th>
             </tr>
@@ -672,7 +672,7 @@
 /* ════════════════════════════════════════════════════════
    KONFIGURASI — Tukar API_URL dengan deployment URL anda
    ════════════════════════════════════════════════════════ */
-const API_URL = 'https://script.google.com/macros/s/AKfycbzeEa5DXjl84Vo2qmOZ1Svq_ku3kzAfFF-RN8fXwY46_uc-8qwXu4aZeE6oZvWNdFF1Hw/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbwphzYaZSQbhTsx2A3k1dhMr48o_Q01I3FewHxzY6FmPeJaIFbOk71XsM1lBll9sbQ3jA/exec';
 
 /* ───── State ───── */
 const APP = {
@@ -758,16 +758,34 @@ async function addNewName() {
   const nama = document.getElementById('newNameInput').value.trim();
   if (!nama) return;
 
+  // Check duplicate (case-insensitive)
+  const allNames = new Set();
+  APP.ahli.forEach(a => allNames.add(String(a.nama).toLowerCase()));
+  APP.beras.forEach(b => allNames.add(String(b.nama).toLowerCase()));
+  APP.infaq.forEach(i => allNames.add(String(i.nama).toLowerCase()));
+  if (allNames.has(nama.toLowerCase())) {
+    hideAddNameModal();
+    showToast('Nama "' + nama + '" sudah ada. Sila pilih dari senarai.', 'error');
+    return;
+  }
+
   hideAddNameModal();
+  showToast('Menambah nama...', 'success');
   const result = await postData({ action: 'addAhli', nama: nama });
   if (result && result.success) {
-    showToast('Nama "' + nama + '" berjaya ditambah!', 'success');
-    await fetchAllData();
+    // Add locally first so dropdown updates immediately
+    APP.ahli.push({ nama: nama });
+    renderLoginDropdown();
     // Auto-select the new name
     APP.currentUser = nama;
     localStorage.setItem('zakatUser', nama);
     document.getElementById('userSelect').value = nama;
     renderForms();
+    showToast('Nama "' + nama + '" berjaya ditambah!', 'success');
+    // Then refresh from server in background
+    fetchAllData();
+  } else if (!result) {
+    showToast('Gagal menambah nama. Sila cuba lagi.', 'error');
   }
 }
 
@@ -777,9 +795,9 @@ async function addNewName() {
 
 async function submitBeras() {
   if (!APP.currentUser) return;
-  const kg = Number(document.getElementById('berasKg').value);
-  if (!kg || kg <= 0) {
-    showToast('Sila masukkan berat KG yang sah.', 'error');
+  const beg = Number(document.getElementById('berasBeg').value);
+  if (!beg || beg <= 0) {
+    showToast('Sila masukkan jumlah beg yang sah.', 'error');
     return;
   }
 
@@ -788,11 +806,13 @@ async function submitBeras() {
   btn.textContent = 'Menghantar...';
 
   const saiz = Number(document.getElementById('berasSaiz').value) || 5;
+  const kg = beg * saiz;
   const result = await postData({
     action: 'addBeras',
     nama: APP.currentUser,
-    kg: kg,
+    beg: beg,
     saiz: saiz,
+    kg: kg,
     status: 'Belum Confirm'
   });
 
@@ -801,8 +821,8 @@ async function submitBeras() {
 
   if (result && result.success) {
     showToast('Sumbangan beras berjaya dikemaskini!', 'success');
-    document.getElementById('berasKg').value = '';
-    updateBegPreview();
+    document.getElementById('berasBeg').value = '';
+    updateKgPreview();
     await fetchAllData();
   }
 }
@@ -963,9 +983,9 @@ function renderBerasList() {
     html += '<tr class="' + rowClass + '">'
       + '<td>' + (i + 1) + '</td>'
       + '<td><strong>' + escHtml(b.nama) + '</strong></td>'
-      + '<td>' + kg + ' kg</td>'
-      + '<td>' + saiz + ' kg</td>'
       + '<td>' + beg + ' beg</td>'
+      + '<td>' + saiz + ' kg</td>'
+      + '<td>' + kg + ' kg</td>'
       + '<td>' + badge + '</td>'
       + '<td><div class="action-btns">' + actions + '</div></td>'
       + '</tr>';
@@ -975,9 +995,9 @@ function renderBerasList() {
   html += '<tr class="total-row">'
     + '<td></td>'
     + '<td>JUMLAH</td>'
-    + '<td>' + totalKg + ' kg</td>'
-    + '<td></td>'
     + '<td>' + totalBeg + ' beg</td>'
+    + '<td></td>'
+    + '<td>' + totalKg + ' kg</td>'
     + '<td></td><td></td>'
     + '</tr>';
 
@@ -1068,7 +1088,7 @@ function generateWhatsAppText() {
   APP.beras.forEach((b, i) => {
     const status = String(b.status || '').toLowerCase() === 'disahkan' ? ' ✅' : '';
     const saiz = Number(b.saiz || 5);
-    lines.push((i + 1) + ') ' + b.nama + ' - ' + b.kg + 'kg = ' + b.beg + ' beg (' + saiz + 'kg)' + status);
+    lines.push((i + 1) + ') ' + b.nama + ' - ' + b.beg + ' beg x ' + saiz + 'kg = ' + b.kg + 'kg' + status);
   });
 
   const totalBeg = APP.beras.reduce((s, b) => s + Number(b.beg || 0), 0);
@@ -1138,11 +1158,11 @@ async function copyToClipboard() {
    HELPERS
    ═══════════════════ */
 
-function updateBegPreview() {
-  const kg = Number(document.getElementById('berasKg').value) || 0;
+function updateKgPreview() {
+  const beg = Number(document.getElementById('berasBeg').value) || 0;
   const saiz = Number(document.getElementById('berasSaiz').value) || 5;
-  const beg = kg > 0 ? Math.ceil(kg / saiz) : 0;
-  document.getElementById('begPreview').textContent = '= ' + beg + ' beg (' + saiz + 'kg)';
+  const kg = beg * saiz;
+  document.getElementById('kgPreview').textContent = '= ' + kg + ' kg';
 }
 
 function showLoading(show) {
