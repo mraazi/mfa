@@ -837,7 +837,6 @@
               <th>Beg</th>
               <th>Saiz</th>
               <th>Jumlah KG</th>
-              <th>Status</th>
               <th></th>
             </tr>
           </thead>
@@ -1137,7 +1136,7 @@
 /* ════════════════════════════════════════════════════════
    KONFIGURASI — Tukar API_URL dengan deployment URL anda
    ════════════════════════════════════════════════════════ */
-const API_URL = 'https://script.google.com/macros/s/AKfycbxWmVfinqbjtBv7TkRB8aWOwJT_iKlhlh6mmvJE3UYlLJpF_2YzlULpb9_GZpVKJWybtw/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbwCcMc97kJcXQijZq4oUMa0j9tNNJaNs4wUmlONcZGjpOqwSuSEKakX9dfKLAF-MyrECw/exec';
 
 /* ───── State ───── */
 const APP = {
@@ -1196,6 +1195,26 @@ async function postData(payload) {
   } catch (err) {
     showToast('Ralat rangkaian. Cuba lagi.', 'error');
     console.error('Post error:', err);
+    return null;
+  }
+}
+
+// POST with no-cors for large payloads (e.g. photos).
+// GAS processes the request but we can't read the response due to CORS redirect.
+// We assume success and refresh data afterwards.
+async function postDataLarge(payload) {
+  try {
+    await fetch(API_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(payload)
+    });
+    // Opaque response — assume success, caller should refresh data
+    return { success: true };
+  } catch (err) {
+    showToast('Ralat rangkaian. Cuba lagi.', 'error');
+    console.error('PostLarge error:', err);
     return null;
   }
 }
@@ -1442,29 +1461,19 @@ function renderBerasList() {
     totalKg += kg;
     totalBeg += beg;
 
-    const isConfirmed = String(b.status || '').toLowerCase() === 'disahkan';
-    const rowClass = isConfirmed ? '' : 'belum-confirm';
-    const badge = isConfirmed
-      ? '<span class="badge badge-green">Disahkan</span>'
-      : '<span class="badge badge-yellow">Belum Confirm</span>';
-
     let actions = '';
     if (APP.currentUser && APP.currentUser.toLowerCase() === String(b.nama).toLowerCase()) {
       actions += '<button class="btn-icon delete" onclick="deleteBeras(\'' + escHtml(b.nama) + '\')">Padam</button>';
-      if (!isConfirmed) {
-        actions += '<button class="btn-icon confirm" onclick="confirmBeras(\'' + escHtml(b.nama) + '\')">Sahkan</button>';
-      }
     }
 
     const saiz = Number(b.saiz || 5);
 
-    html += '<tr class="' + rowClass + '">'
+    html += '<tr>'
       + '<td>' + (i + 1) + '</td>'
       + '<td><strong>' + escHtml(b.nama) + '</strong></td>'
       + '<td>' + beg + ' beg</td>'
       + '<td>' + saiz + ' kg</td>'
       + '<td>' + kg + ' kg</td>'
-      + '<td>' + badge + '</td>'
       + '<td><div class="action-btns">' + actions + '</div></td>'
       + '</tr>';
   });
@@ -1476,7 +1485,7 @@ function renderBerasList() {
     + '<td>' + totalBeg + ' beg</td>'
     + '<td></td>'
     + '<td>' + totalKg + ' kg</td>'
-    + '<td></td><td></td>'
+    + '<td></td>'
     + '</tr>';
 
   tbody.innerHTML = html;
@@ -1650,7 +1659,7 @@ function handlePhotoCapture(input) {
     const img = new Image();
     img.onload = function() {
       const canvas = document.createElement('canvas');
-      const maxSize = 100; // small thumbnail for spreadsheet storage
+      const maxSize = 480;
       let w = img.width, h = img.height;
       if (w > maxSize || h > maxSize) {
         if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
@@ -1659,7 +1668,7 @@ function handlePhotoCapture(input) {
       canvas.width = w;
       canvas.height = h;
       canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.2);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
       APP.pendingPhoto = dataUrl; // store full data URL
       const preview = document.getElementById('penPhotoPreview');
       preview.src = dataUrl;
@@ -1713,8 +1722,7 @@ async function submitPenerima() {
   var existing = APP.penerima.find(function(p) { return String(p.icno) === String(icno); });
   var fotoVal = APP.pendingPhoto || ((existing && existing.foto) ? existing.foto : '');
 
-  // Save penerima data with foto stored directly as data URL in spreadsheet
-  const result = await postData({
+  var payload = {
     action: 'addPenerima',
     nama: nama,
     icno: icno,
@@ -1729,7 +1737,13 @@ async function submitPenerima() {
     foto: fotoVal,
     lokasi: document.getElementById('penLokasi').value,
     addedby: APP.currentUser
-  });
+  };
+
+  // Use POST (no-cors) for large payloads with photo, GET for small payloads
+  var hasLargeData = fotoVal && fotoVal.length > 2000;
+  const result = hasLargeData
+    ? await postDataLarge(payload)
+    : await postData(payload);
 
   btn.disabled = false;
   btn.textContent = 'Hantar';
