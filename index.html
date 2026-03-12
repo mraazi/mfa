@@ -1702,7 +1702,9 @@ async function submitPenerima() {
   btn.disabled = true;
   btn.textContent = 'Menghantar...';
 
-  let fotoId = '';
+  // Preserve existing foto if editing without selecting new photo
+  var existing = APP.penerima.find(function(p) { return String(p.icno) === String(icno); });
+  let fotoId = (existing && existing.foto) ? existing.foto : '';
 
   // Upload photo first if exists
   if (APP.pendingPhoto) {
