@@ -662,7 +662,7 @@
 /* ════════════════════════════════════════════════════════
    KONFIGURASI — Tukar API_URL dengan deployment URL anda
    ════════════════════════════════════════════════════════ */
-const API_URL = 'https://script.google.com/macros/s/AKfycbz8Dg_W98V9wt5grgs7IHOwAXecP6JO_MD_4B3g1-5VUqq-35xVcVC_kGmQN2FB3jdWYg/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbwEWKp97FPUSJTgY7GH1jtNQBPGANWSNcyn0rM7IimA67U6gVR57N7jzuTk-Y38UqDRFg/exec';
 
 /* ───── State ───── */
 const APP = {
@@ -703,11 +703,9 @@ async function fetchAllData() {
 
 async function postData(payload) {
   try {
-    const res = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify(payload)
-    });
+    // Use GET with encoded data to avoid CORS redirect issues with Google Apps Script
+    const url = API_URL + '?action=write&data=' + encodeURIComponent(JSON.stringify(payload));
+    const res = await fetch(url);
     const data = await res.json();
     if (data.error) {
       showToast(data.error, 'error');
