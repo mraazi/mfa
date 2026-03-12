@@ -1843,7 +1843,7 @@ function renderPenerimaList() {
   let html = '';
   APP.penerima.forEach((p, i) => {
     const fotoCell = p.foto
-      ? '<img class="photo-thumb" src="https://drive.google.com/thumbnail?id=' + escHtml(p.foto) + '&sz=w80" onclick="showPhotoModal(\'' + escHtml(p.foto) + '\')" alt="Foto">'
+      ? '<img class="photo-thumb" src="https://lh3.googleusercontent.com/d/' + escHtml(p.foto) + '=s80" onclick="showPhotoModal(\'' + escHtml(p.foto) + '\')" alt="Foto">'
       : '-';
     const lokasi = p.lokasi
       ? '<a href="https://www.google.com/maps?q=' + escHtml(p.lokasi) + '" target="_blank" style="color:var(--green);font-size:0.8rem">Lihat Peta</a>'
@@ -1872,7 +1872,7 @@ function renderPenerimaList() {
 
 function showPhotoModal(fileId) {
   const modal = document.getElementById('photoModal');
-  document.getElementById('photoModalImg').src = 'https://drive.google.com/thumbnail?id=' + fileId + '&sz=w800';
+  document.getElementById('photoModalImg').src = 'https://lh3.googleusercontent.com/d/' + fileId + '=s800';
   modal.classList.add('visible');
 }
 
@@ -1908,7 +1908,7 @@ function renderDirektori() {
   var html = '';
   filtered.forEach(function(p, i) {
     var photoHtml = p.foto
-      ? '<img class="card-photo" src="https://drive.google.com/thumbnail?id=' + escHtml(p.foto) + '&sz=w200" alt="Foto" loading="lazy">'
+      ? '<img class="card-photo" src="https://lh3.googleusercontent.com/d/' + escHtml(p.foto) + '=s200" alt="Foto" loading="lazy">'
       : '<div class="no-photo">&#128100;</div>';
     var badge = p.jenisbantuan
       ? '<span class="card-badge">' + escHtml(p.jenisbantuan) + '</span>'
@@ -1932,7 +1932,7 @@ function showProfile(index) {
   if (!p) return;
 
   var photoHtml = p.foto
-    ? '<img class="profile-photo" src="https://drive.google.com/thumbnail?id=' + escHtml(p.foto) + '&sz=w500" alt="Foto">'
+    ? '<img class="profile-photo" src="https://lh3.googleusercontent.com/d/' + escHtml(p.foto) + '=s500" alt="Foto">'
     : '<div class="profile-no-photo">&#128100;</div>';
 
   var lokasi = '';
