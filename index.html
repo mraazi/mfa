@@ -1645,7 +1645,7 @@ function handlePhotoCapture(input) {
     const img = new Image();
     img.onload = function() {
       const canvas = document.createElement('canvas');
-      const maxSize = 200;
+      const maxSize = 100; // small thumbnail for spreadsheet storage
       let w = img.width, h = img.height;
       if (w > maxSize || h > maxSize) {
         if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
@@ -1654,8 +1654,8 @@ function handlePhotoCapture(input) {
       canvas.width = w;
       canvas.height = h;
       canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.3);
-      APP.pendingPhoto = dataUrl.split(',')[1]; // base64 only
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.2);
+      APP.pendingPhoto = dataUrl; // store full data URL
       const preview = document.getElementById('penPhotoPreview');
       preview.src = dataUrl;
       preview.classList.add('visible');
@@ -1706,9 +1706,9 @@ async function submitPenerima() {
 
   // Preserve existing foto if editing without selecting new photo
   var existing = APP.penerima.find(function(p) { return String(p.icno) === String(icno); });
-  let fotoId = (existing && existing.foto) ? existing.foto : '';
+  var fotoVal = APP.pendingPhoto || ((existing && existing.foto) ? existing.foto : '');
 
-  // Save penerima data first (without new foto)
+  // Save penerima data with foto stored directly as data URL in spreadsheet
   const result = await postData({
     action: 'addPenerima',
     nama: nama,
@@ -1721,24 +1721,10 @@ async function submitPenerima() {
     bilanak: document.getElementById('penAnak').value,
     jenisbantuan: document.getElementById('penBantuan').value,
     catatan: document.getElementById('penCatatan').value.trim(),
-    foto: fotoId,
+    foto: fotoVal,
     lokasi: document.getElementById('penLokasi').value,
     addedby: APP.currentUser
   });
-
-  // Upload photo after saving data — backend links it to penerima row via icno
-  if (APP.pendingPhoto && result && result.success) {
-    showToast('Memuat naik gambar...', 'success');
-    var photoResult = await postData({
-      action: 'uploadPhoto',
-      base64: APP.pendingPhoto,
-      filename: 'penerima_' + icno + '_' + Date.now() + '.jpg',
-      icno: icno
-    });
-    if (!photoResult || !photoResult.success) {
-      showToast('Gambar gagal dimuat naik. Cuba saiz lebih kecil.', 'error');
-    }
-  }
 
   btn.disabled = false;
   btn.textContent = 'Hantar';
@@ -1789,7 +1775,7 @@ function renderPenerimaList() {
   let html = '';
   APP.penerima.forEach((p, i) => {
     const fotoCell = p.foto
-      ? '<img class="photo-thumb" src="https://lh3.googleusercontent.com/d/' + escHtml(p.foto) + '=s80" onclick="showPhotoModal(\'' + escHtml(p.foto) + '\')" alt="Foto">'
+      ? '<img class="photo-thumb" src="' + fotoSrc(p.foto, 80) + '" onclick="showPhotoModal(' + i + ')" alt="Foto">'
       : '-';
     const lokasi = p.lokasi
       ? '<a href="https://www.google.com/maps?q=' + escHtml(p.lokasi) + '" target="_blank" style="color:var(--green);font-size:0.8rem">Lihat Peta</a>'
@@ -1816,9 +1802,11 @@ function renderPenerimaList() {
   tbody.innerHTML = html;
 }
 
-function showPhotoModal(fileId) {
+function showPhotoModal(index) {
+  var p = APP.penerima[index];
+  if (!p || !p.foto) return;
   const modal = document.getElementById('photoModal');
-  document.getElementById('photoModalImg').src = 'https://lh3.googleusercontent.com/d/' + fileId + '=s800';
+  document.getElementById('photoModalImg').src = fotoSrc(p.foto, 800);
   modal.classList.add('visible');
 }
 
@@ -1854,7 +1842,7 @@ function renderDirektori() {
   var html = '';
   filtered.forEach(function(p, i) {
     var photoHtml = p.foto
-      ? '<img class="card-photo" src="https://lh3.googleusercontent.com/d/' + escHtml(p.foto) + '=s200" alt="Foto" loading="lazy">'
+      ? '<img class="card-photo" src="' + fotoSrc(p.foto, 200) + '" alt="Foto" loading="lazy">'
       : '<div class="no-photo">&#128100;</div>';
     var badge = p.jenisbantuan
       ? '<span class="card-badge">' + escHtml(p.jenisbantuan) + '</span>'
@@ -2137,6 +2125,12 @@ function escHtml(str) {
   const div = document.createElement('div');
   div.textContent = str;
   return div.innerHTML;
+}
+
+function fotoSrc(foto, size) {
+  if (!foto) return '';
+  if (String(foto).indexOf('data:') === 0) return foto; // data URL stored in spreadsheet
+  return 'https://lh3.googleusercontent.com/d/' + foto + '=s' + (size || 200); // Drive file ID (legacy)
 }
 
 /* ═══════════════════
