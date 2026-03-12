@@ -1136,7 +1136,7 @@
 /* ════════════════════════════════════════════════════════
    KONFIGURASI — Tukar API_URL dengan deployment URL anda
    ════════════════════════════════════════════════════════ */
-const API_URL = 'https://script.google.com/macros/s/AKfycbwCcMc97kJcXQijZq4oUMa0j9tNNJaNs4wUmlONcZGjpOqwSuSEKakX9dfKLAF-MyrECw/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbza3E1hCdlYkiwKgErq-B3V_q-EPg60Pc7JjpPJHoyerohksRt5rwz_t3wJ-rS0qKyr8Q/exec';
 
 /* ───── State ───── */
 const APP = {
@@ -1669,7 +1669,7 @@ function handlePhotoCapture(input) {
       canvas.height = h;
       canvas.getContext('2d').drawImage(img, 0, 0, w, h);
       const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
-      APP.pendingPhoto = dataUrl; // store full data URL
+      APP.pendingPhoto = dataUrl.split(',')[1]; // base64 only for Drive upload
       const preview = document.getElementById('penPhotoPreview');
       preview.src = dataUrl;
       preview.classList.add('visible');
@@ -1718,11 +1718,12 @@ async function submitPenerima() {
   btn.disabled = true;
   btn.textContent = 'Menghantar...';
 
-  // Preserve existing foto if editing without selecting new photo
+  // Preserve existing foto ID if editing without selecting new photo
   var existing = APP.penerima.find(function(p) { return String(p.icno) === String(icno); });
-  var fotoVal = APP.pendingPhoto || ((existing && existing.foto) ? existing.foto : '');
+  var fotoId = (existing && existing.foto) ? existing.foto : '';
 
-  var payload = {
+  // Step 1: Save penerima data via GET (without photo base64)
+  const result = await postData({
     action: 'addPenerima',
     nama: nama,
     icno: icno,
@@ -1734,16 +1735,21 @@ async function submitPenerima() {
     bilanak: document.getElementById('penAnak').value,
     jenisbantuan: document.getElementById('penBantuan').value,
     catatan: document.getElementById('penCatatan').value.trim(),
-    foto: fotoVal,
+    foto: fotoId,
     lokasi: document.getElementById('penLokasi').value,
     addedby: APP.currentUser
-  };
+  });
 
-  // Use POST (no-cors) for large payloads with photo, GET for small payloads
-  var hasLargeData = fotoVal && fotoVal.length > 2000;
-  const result = hasLargeData
-    ? await postDataLarge(payload)
-    : await postData(payload);
+  // Step 2: Upload photo to Google Drive via POST (no-cors) — backend links it to penerima via icno
+  if (APP.pendingPhoto && result && result.success) {
+    showToast('Memuat naik gambar ke Drive...', 'success');
+    await postDataLarge({
+      action: 'uploadPhoto',
+      base64: APP.pendingPhoto,
+      filename: 'penerima_' + icno + '_' + Date.now() + '.jpg',
+      icno: icno
+    });
+  }
 
   btn.disabled = false;
   btn.textContent = 'Hantar';
