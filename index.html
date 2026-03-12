@@ -111,7 +111,7 @@
     .container {
       max-width: 800px;
       margin: 0 auto;
-      padding: 20px 16px 100px;
+      padding: 20px 16px 80px;
     }
 
     /* ───── Dashboard ───── */
@@ -187,34 +187,42 @@
       margin-top: 4px;
     }
 
-    /* ───── Tabs ───── */
-    .tabs {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 4px;
-      margin-bottom: 16px;
+    /* ───── Bottom Nav ───── */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 800;
+      background: var(--bg-mid);
+      border-top: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      justify-content: space-around;
+      padding: 6px 0;
+      padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px));
     }
-    @media (min-width: 601px) {
-      .tabs { grid-template-columns: repeat(5, 1fr); }
-    }
-    .tab-btn {
-      padding: 10px 8px;
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      background: none;
       border: none;
-      background: rgba(255,255,255,0.06);
-      color: var(--text-white);
+      color: rgba(255,255,255,0.45);
       font-family: inherit;
-      font-size: 0.82rem;
+      font-size: 0.6rem;
       font-weight: 500;
       cursor: pointer;
+      padding: 4px 8px;
       border-radius: var(--radius-sm);
-      transition: all 0.2s;
+      transition: color 0.2s;
+      min-width: 56px;
     }
-    .tab-btn.active {
-      background: var(--green);
-      color: #fff;
-      font-weight: 600;
+    .nav-item .nav-icon { font-size: 1.3rem; line-height: 1; }
+    .nav-item.active {
+      color: var(--accent);
     }
-    .tab-btn:not(.active):hover { background: rgba(255,255,255,0.1); }
+    .nav-item:not(.active):hover { color: rgba(255,255,255,0.7); }
 
     /* ───── Forms ───── */
     .form-card {
@@ -794,8 +802,8 @@
 
   <div class="container">
 
-    <!-- Dashboard -->
-    <div class="dashboard">
+    <!-- Dashboard (shown on beras/infaq tabs only) -->
+    <div class="dashboard" id="dashboardSection">
       <div class="stat-card">
         <div class="value" id="totalBeg">0</div>
         <div class="label">Jumlah Beg</div>
@@ -810,8 +818,8 @@
       </div>
     </div>
 
-    <!-- Infaq Progress -->
-    <div class="progress-card">
+    <!-- Infaq Progress (shown on infaq tab only) -->
+    <div class="progress-card" id="infaqProgressSection" style="display:none">
       <div class="progress-header">
         <span class="progress-title">Pakej Infaq</span>
         <span class="progress-amount"><strong id="infaqCollected">RM0</strong> / <span id="infaqTarget">RM4,000</span></span>
@@ -820,15 +828,6 @@
         <div class="progress-bar-fill" id="infaqBar" style="width: 0%"></div>
       </div>
       <div class="progress-pct" id="infaqPct">0%</div>
-    </div>
-
-    <!-- Tabs -->
-    <div class="tabs">
-      <button class="tab-btn active" data-tab="beras" onclick="switchTab('beras')">&#127834; Senarai Beras</button>
-      <button class="tab-btn" data-tab="infaq" onclick="switchTab('infaq')">&#128176; Pakej Infaq</button>
-      <button class="tab-btn" data-tab="penerima" onclick="switchTab('penerima')">&#128101; Penerima</button>
-      <button class="tab-btn" data-tab="agihan" onclick="switchTab('agihan')">&#128230; Agihan</button>
-      <button class="tab-btn" data-tab="direktori" onclick="switchTab('direktori')">&#128209; Direktori</button>
     </div>
 
     <!-- Beras Tab -->
@@ -1114,6 +1113,25 @@
     </div>
 
   </div>
+
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-tab="beras" onclick="switchTab('beras')">
+      <span class="nav-icon">&#127834;</span>Beras
+    </button>
+    <button class="nav-item" data-tab="infaq" onclick="switchTab('infaq')">
+      <span class="nav-icon">&#128176;</span>Infaq
+    </button>
+    <button class="nav-item" data-tab="penerima" onclick="switchTab('penerima')">
+      <span class="nav-icon">&#128101;</span>Penerima
+    </button>
+    <button class="nav-item" data-tab="agihan" onclick="switchTab('agihan')">
+      <span class="nav-icon">&#128230;</span>Agihan
+    </button>
+    <button class="nav-item" data-tab="direktori" onclick="switchTab('direktori')">
+      <span class="nav-icon">&#128209;</span>Direktori
+    </button>
+  </nav>
 
   <!-- Photo Modal -->
   <div class="photo-modal-overlay" id="photoModal" onclick="this.classList.remove('visible')">
@@ -1552,12 +1570,18 @@ function renderForms() {
 
 function switchTab(tab) {
   APP.activeTab = tab;
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.tab === tab);
+  // Update nav items
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.classList.toggle('active', item.dataset.tab === tab);
   });
+  // Show/hide tab content
   ['beras', 'infaq', 'penerima', 'agihan', 'direktori'].forEach(t => {
     document.getElementById('tab-' + t).style.display = t === tab ? 'block' : 'none';
   });
+  // Context-aware dashboard
+  var showDash = (tab === 'beras' || tab === 'infaq');
+  document.getElementById('dashboardSection').style.display = showDash ? 'grid' : 'none';
+  document.getElementById('infaqProgressSection').style.display = tab === 'infaq' ? 'block' : 'none';
 }
 
 /* ═══════════════════
