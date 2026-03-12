@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bantuan Ramadan 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a1a0f;
+      --bg-mid: #112218;
+      --card: #ffffff;
+      --card-border: #e2e8f0;
+      --accent: #c9a84c;
+      --accent-hover: #b8932f;
+      --green: #2d8a4e;
+      --green-light: #e8f5e9;
+      --green-dark: #1b5e32;
+      --yellow-bg: #fff9e6;
+      --yellow-border: #f0d060;
+      --red: #dc3545;
+      --red-hover: #c82333;
+      --text: #1a1a2e;
+      --text-light: #64748b;
+      --text-white: #f1f5f9;
+      --progress-bg: #e0e0e0;
+      --shadow: 0 2px 8px rgba(0,0,0,0.08);
+      --shadow-lg: 0 4px 16px rgba(0,0,0,0.12);
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ───── Header ───── */
+    .header {
+      background: linear-gradient(135deg, var(--green-dark), var(--green));
+      padding: 20px 24px;
+      text-align: center;
+      position: relative;
+    }
+    .header h1 {
+      color: var(--accent);
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .header p {
+      color: var(--text-white);
+      font-size: 0.85rem;
+      opacity: 0.85;
+    }
+
+    /* ───── Login Bar ───── */
+    .login-bar {
+      background: var(--bg-mid);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .login-bar label {
+      color: var(--text-white);
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+    .login-bar select,
+    .login-bar input,
+    .login-bar button {
+      font-family: inherit;
+      font-size: 0.85rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(255,255,255,0.15);
+      padding: 8px 12px;
+    }
+    .login-bar select {
+      background: rgba(255,255,255,0.1);
+      color: var(--text-white);
+      min-width: 180px;
+      cursor: pointer;
+    }
+    .login-bar select option { background: var(--bg-mid); color: #fff; }
+    .login-bar input {
+      background: rgba(255,255,255,0.1);
+      color: var(--text-white);
+      width: 150px;
+    }
+    .login-bar input::placeholder { color: rgba(255,255,255,0.4); }
+    .btn-sm {
+      background: var(--accent);
+      color: #000;
+      border: none;
+      padding: 8px 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-sm:hover { background: var(--accent-hover); }
+
+    /* ───── Container ───── */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px 16px 100px;
+    }
+
+    /* ───── Dashboard ───── */
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .stat-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 16px;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+    .stat-card .value {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--green);
+    }
+    .stat-card .label {
+      font-size: 0.75rem;
+      color: var(--text-light);
+      margin-top: 2px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .progress-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+    }
+    .progress-card .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 8px;
+    }
+    .progress-card .progress-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .progress-card .progress-amount {
+      font-size: 0.85rem;
+      color: var(--text-light);
+    }
+    .progress-card .progress-amount strong {
+      color: var(--green);
+      font-size: 1rem;
+    }
+    .progress-bar-bg {
+      width: 100%;
+      height: 12px;
+      background: var(--progress-bg);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--green), var(--accent));
+      border-radius: 6px;
+      transition: width 0.6s ease;
+    }
+    .progress-pct {
+      text-align: right;
+      font-size: 0.75rem;
+      color: var(--text-light);
+      margin-top: 4px;
+    }
+
+    /* ───── Tabs ───── */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 16px;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      background: rgba(255,255,255,0.06);
+      color: var(--text-white);
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      border-radius: var(--radius-sm);
+      transition: all 0.2s;
+    }
+    .tab-btn.active {
+      background: var(--green);
+      color: #fff;
+      font-weight: 600;
+    }
+    .tab-btn:not(.active):hover { background: rgba(255,255,255,0.1); }
+
+    /* ───── Forms ───── */
+    .form-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow);
+      display: none;
+    }
+    .form-card.visible { display: block; }
+    .form-card h3 {
+      font-size: 0.9rem;
+      margin-bottom: 12px;
+      color: var(--text);
+    }
+    .form-row {
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+      flex-wrap: wrap;
+    }
+    .form-group {
+      flex: 1;
+      min-width: 100px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-light);
+      margin-bottom: 4px;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 0.9rem;
+    }
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(45,138,78,0.15);
+    }
+    .form-preview {
+      font-size: 0.8rem;
+      color: var(--green);
+      font-weight: 600;
+      padding: 10px 0;
+      white-space: nowrap;
+    }
+    .btn-primary {
+      background: var(--green);
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .btn-primary:hover { background: var(--green-dark); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ───── Table ───── */
+    .table-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+    }
+    .table-card table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .table-card th {
+      background: var(--green-light);
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--green-dark);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .table-card td {
+      padding: 10px 14px;
+      font-size: 0.85rem;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .table-card tr:last-child td { border-bottom: none; }
+    .table-card tr.belum-confirm {
+      background: var(--yellow-bg);
+    }
+    .table-card tr.total-row {
+      background: var(--green-light);
+      font-weight: 700;
+    }
+    .table-card tr.total-row td {
+      border-bottom: none;
+      color: var(--green-dark);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+    .badge-green { background: var(--green-light); color: var(--green-dark); }
+    .badge-yellow { background: var(--yellow-bg); color: #8a6d00; border: 1px solid var(--yellow-border); }
+
+    .action-btns {
+      display: flex;
+      gap: 6px;
+    }
+    .btn-icon {
+      background: none;
+      border: 1px solid var(--card-border);
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 0.7rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-icon:hover { background: #f1f5f9; }
+    .btn-icon.delete { color: var(--red); border-color: var(--red); }
+    .btn-icon.delete:hover { background: #fee; }
+    .btn-icon.confirm { color: var(--green); border-color: var(--green); }
+    .btn-icon.confirm:hover { background: var(--green-light); }
+
+    /* ───── WhatsApp Share ───── */
+    .share-section {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .btn-whatsapp {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px;
+      border: none;
+      border-radius: var(--radius-sm);
+      background: #25d366;
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-whatsapp:hover { background: #1da851; }
+    .btn-copy {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: var(--radius-sm);
+      background: rgba(255,255,255,0.06);
+      color: var(--text-white);
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-copy:hover { background: rgba(255,255,255,0.12); }
+    .btn-copy.copied {
+      background: var(--green);
+      border-color: var(--green);
+      color: #fff;
+    }
+
+    /* ───── Toast ───── */
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .toast {
+      padding: 12px 20px;
+      border-radius: var(--radius-sm);
+      color: #fff;
+      font-size: 0.85rem;
+      font-weight: 500;
+      box-shadow: var(--shadow-lg);
+      animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s;
+      max-width: 300px;
+    }
+    .toast.success { background: var(--green); }
+    .toast.error { background: var(--red); }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+
+    /* ───── Loading ───── */
+    .loading-overlay {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      color: var(--text-white);
+      font-size: 0.9rem;
+    }
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid rgba(255,255,255,0.2);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-right: 10px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ───── Empty State ───── */
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-light);
+      font-size: 0.9rem;
+    }
+    .empty-state .emoji { font-size: 2rem; margin-bottom: 8px; }
+
+    /* ───── Modal ───── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 900;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.visible { display: flex; }
+    .modal {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 24px;
+      width: 90%;
+      max-width: 360px;
+      box-shadow: var(--shadow-lg);
+    }
+    .modal h3 { margin-bottom: 12px; font-size: 1rem; }
+    .modal input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 0.9rem;
+      margin-bottom: 12px;
+    }
+    .modal-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+    .btn-cancel {
+      padding: 8px 16px;
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-sm);
+      background: #fff;
+      font-family: inherit;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    /* ───── Responsive ───── */
+    @media (max-width: 600px) {
+      .dashboard { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+      .stat-card { padding: 12px 8px; }
+      .stat-card .value { font-size: 1.4rem; }
+      .form-row { flex-direction: column; }
+      .form-group { min-width: 100%; }
+      .table-card { font-size: 0.8rem; }
+      .table-card th, .table-card td { padding: 8px 10px; }
+      .action-btns { flex-direction: column; gap: 4px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <h1>&#127769; Bantuan Ramadan 2026</h1>
+    <p>Kutipan Zakat Fitrah (Beras) & Pakej Infaq MFA</p>
+  </div>
+
+  <!-- Login Bar -->
+  <div class="login-bar">
+    <label>Log masuk:</label>
+    <select id="userSelect" onchange="handleLogin(this.value)">
+      <option value="">-- Pilih Nama --</option>
+    </select>
+    <button class="btn-sm" onclick="showAddNameModal()">+ Nama Baru</button>
+  </div>
+
+  <div class="container">
+
+    <!-- Dashboard -->
+    <div class="dashboard">
+      <div class="stat-card">
+        <div class="value" id="totalBeg">0</div>
+        <div class="label">Jumlah Beg</div>
+      </div>
+      <div class="stat-card">
+        <div class="value" id="totalKg">0</div>
+        <div class="label">Jumlah KG</div>
+      </div>
+      <div class="stat-card">
+        <div class="value" id="totalPenyumbang">0</div>
+        <div class="label">Penyumbang</div>
+      </div>
+    </div>
+
+    <!-- Infaq Progress -->
+    <div class="progress-card">
+      <div class="progress-header">
+        <span class="progress-title">Pakej Infaq</span>
+        <span class="progress-amount"><strong id="infaqCollected">RM0</strong> / <span id="infaqTarget">RM4,000</span></span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="infaqBar" style="width: 0%"></div>
+      </div>
+      <div class="progress-pct" id="infaqPct">0%</div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="beras" onclick="switchTab('beras')">&#127834; Senarai Beras</button>
+      <button class="tab-btn" data-tab="infaq" onclick="switchTab('infaq')">&#128176; Pakej Infaq</button>
+    </div>
+
+    <!-- Beras Tab -->
+    <div id="tab-beras">
+      <!-- Beras Form -->
+      <div class="form-card" id="berasForm">
+        <h3>Tambah / Kemaskini Sumbangan Beras</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Berat (KG)</label>
+            <input type="number" id="berasKg" placeholder="cth: 20" inputmode="numeric" min="1" oninput="updateBegPreview()">
+          </div>
+          <div class="form-preview" id="begPreview">= 0 beg</div>
+          <button class="btn-primary" onclick="submitBeras()" id="btnSubmitBeras">Hantar</button>
+        </div>
+      </div>
+
+      <!-- Beras Table -->
+      <div class="table-card">
+        <div id="berasLoading" class="loading-overlay"><div class="spinner"></div> Memuatkan data...</div>
+        <table id="berasTable" style="display:none">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nama</th>
+              <th>KG</th>
+              <th>Beg</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="berasBody"></tbody>
+        </table>
+        <div id="berasEmpty" class="empty-state" style="display:none">
+          <div class="emoji">&#127834;</div>
+          Belum ada sumbangan beras lagi.<br>Jadi orang pertama!
+        </div>
+      </div>
+    </div>
+
+    <!-- Infaq Tab -->
+    <div id="tab-infaq" style="display:none">
+      <!-- Infaq Form -->
+      <div class="form-card" id="infaqForm">
+        <h3>Tambah / Kemaskini Sumbangan Infaq</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Jumlah (RM)</label>
+            <input type="number" id="infaqAmount" placeholder="cth: 200" inputmode="numeric" min="1">
+          </div>
+          <button class="btn-primary" onclick="submitInfaq()" id="btnSubmitInfaq">Hantar</button>
+        </div>
+      </div>
+
+      <!-- Infaq Table -->
+      <div class="table-card">
+        <div id="infaqLoading" class="loading-overlay"><div class="spinner"></div> Memuatkan data...</div>
+        <table id="infaqTable" style="display:none">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nama</th>
+              <th>Jumlah (RM)</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="infaqBody"></tbody>
+        </table>
+        <div id="infaqEmpty" class="empty-state" style="display:none">
+          <div class="emoji">&#128176;</div>
+          Belum ada kutipan infaq lagi.
+        </div>
+      </div>
+    </div>
+
+    <!-- WhatsApp Share -->
+    <div class="share-section">
+      <button class="btn-whatsapp" onclick="shareWhatsApp()">&#128172; Share WhatsApp</button>
+      <button class="btn-copy" id="btnCopy" onclick="copyToClipboard()">&#128203; Salin Teks</button>
+    </div>
+
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Add Name Modal -->
+  <div class="modal-overlay" id="addNameModal">
+    <div class="modal">
+      <h3>Tambah Nama Baru</h3>
+      <input type="text" id="newNameInput" placeholder="Masukkan nama anda" onkeydown="if(event.key==='Enter') addNewName()">
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="hideAddNameModal()">Batal</button>
+        <button class="btn-primary" onclick="addNewName()">Tambah</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* ════════════════════════════════════════════════════════
+   KONFIGURASI — Tukar API_URL dengan deployment URL anda
+   ════════════════════════════════════════════════════════ */
+const API_URL = 'https://script.google.com/macros/s/AKfycbz8Dg_W98V9wt5grgs7IHOwAXecP6JO_MD_4B3g1-5VUqq-35xVcVC_kGmQN2FB3jdWYg/exec';
+
+/* ───── State ───── */
+const APP = {
+  currentUser: null,
+  beras: [],
+  infaq: [],
+  ahli: [],
+  config: { infaq_target: 4000 },
+  activeTab: 'beras',
+  loading: true
+};
+
+/* ═══════════════════
+   API LAYER
+   ═══════════════════ */
+
+async function fetchAllData() {
+  APP.loading = true;
+  showLoading(true);
+  try {
+    const res = await fetch(API_URL + '?action=all');
+    const data = await res.json();
+    APP.beras = data.beras || [];
+    APP.infaq = data.infaq || [];
+    APP.ahli = data.ahli || [];
+    if (data.config && data.config.infaq_target) {
+      APP.config.infaq_target = Number(data.config.infaq_target);
+    }
+    APP.loading = false;
+    renderAll();
+  } catch (err) {
+    APP.loading = false;
+    showLoading(false);
+    showToast('Gagal memuatkan data. Sila semak sambungan.', 'error');
+    console.error('Fetch error:', err);
+  }
+}
+
+async function postData(payload) {
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (data.error) {
+      showToast(data.error, 'error');
+      return null;
+    }
+    return data;
+  } catch (err) {
+    showToast('Ralat rangkaian. Cuba lagi.', 'error');
+    console.error('Post error:', err);
+    return null;
+  }
+}
+
+/* ═══════════════════
+   LOGIN
+   ═══════════════════ */
+
+function handleLogin(nama) {
+  if (!nama) {
+    APP.currentUser = null;
+    localStorage.removeItem('zakatUser');
+  } else {
+    APP.currentUser = nama;
+    localStorage.setItem('zakatUser', nama);
+  }
+  renderForms();
+}
+
+function showAddNameModal() {
+  document.getElementById('addNameModal').classList.add('visible');
+  document.getElementById('newNameInput').value = '';
+  document.getElementById('newNameInput').focus();
+}
+
+function hideAddNameModal() {
+  document.getElementById('addNameModal').classList.remove('visible');
+}
+
+async function addNewName() {
+  const nama = document.getElementById('newNameInput').value.trim();
+  if (!nama) return;
+
+  hideAddNameModal();
+  const result = await postData({ action: 'addAhli', nama: nama });
+  if (result && result.success) {
+    showToast('Nama "' + nama + '" berjaya ditambah!', 'success');
+    await fetchAllData();
+    // Auto-select the new name
+    APP.currentUser = nama;
+    localStorage.setItem('zakatUser', nama);
+    document.getElementById('userSelect').value = nama;
+    renderForms();
+  }
+}
+
+/* ═══════════════════
+   SUBMIT HANDLERS
+   ═══════════════════ */
+
+async function submitBeras() {
+  if (!APP.currentUser) return;
+  const kg = Number(document.getElementById('berasKg').value);
+  if (!kg || kg <= 0) {
+    showToast('Sila masukkan berat KG yang sah.', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('btnSubmitBeras');
+  btn.disabled = true;
+  btn.textContent = 'Menghantar...';
+
+  const result = await postData({
+    action: 'addBeras',
+    nama: APP.currentUser,
+    kg: kg,
+    status: 'Belum Confirm'
+  });
+
+  btn.disabled = false;
+  btn.textContent = 'Hantar';
+
+  if (result && result.success) {
+    showToast('Sumbangan beras berjaya dikemaskini!', 'success');
+    document.getElementById('berasKg').value = '';
+    updateBegPreview();
+    await fetchAllData();
+  }
+}
+
+async function submitInfaq() {
+  if (!APP.currentUser) return;
+  const jumlah = Number(document.getElementById('infaqAmount').value);
+  if (!jumlah || jumlah <= 0) {
+    showToast('Sila masukkan jumlah RM yang sah.', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('btnSubmitInfaq');
+  btn.disabled = true;
+  btn.textContent = 'Menghantar...';
+
+  const result = await postData({
+    action: 'addInfaq',
+    nama: APP.currentUser,
+    jumlah: jumlah
+  });
+
+  btn.disabled = false;
+  btn.textContent = 'Hantar';
+
+  if (result && result.success) {
+    showToast('Sumbangan infaq berjaya dikemaskini!', 'success');
+    document.getElementById('infaqAmount').value = '';
+    await fetchAllData();
+  }
+}
+
+async function deleteBeras(nama) {
+  if (!confirm('Padam sumbangan beras untuk "' + nama + '"?')) return;
+  const result = await postData({ action: 'deleteBeras', nama: nama });
+  if (result && result.success) {
+    showToast('Dipadam.', 'success');
+    await fetchAllData();
+  }
+}
+
+async function deleteInfaq(nama) {
+  if (!confirm('Padam sumbangan infaq untuk "' + nama + '"?')) return;
+  const result = await postData({ action: 'deleteInfaq', nama: nama });
+  if (result && result.success) {
+    showToast('Dipadam.', 'success');
+    await fetchAllData();
+  }
+}
+
+async function confirmBeras(nama) {
+  const result = await postData({ action: 'confirmBeras', nama: nama });
+  if (result && result.success) {
+    showToast('Status disahkan!', 'success');
+    await fetchAllData();
+  }
+}
+
+/* ═══════════════════
+   RENDER FUNCTIONS
+   ═══════════════════ */
+
+function renderAll() {
+  showLoading(false);
+  renderLoginDropdown();
+  renderDashboard();
+  renderBerasList();
+  renderInfaqList();
+  renderForms();
+}
+
+function renderLoginDropdown() {
+  const sel = document.getElementById('userSelect');
+  const prev = APP.currentUser || localStorage.getItem('zakatUser');
+
+  // Collect all unique names from ahli + beras + infaq
+  const names = new Set();
+  APP.ahli.forEach(a => names.add(a.nama));
+  APP.beras.forEach(b => names.add(b.nama));
+  APP.infaq.forEach(i => names.add(i.nama));
+
+  const sorted = Array.from(names).sort((a, b) => a.localeCompare(b, 'ms'));
+
+  sel.innerHTML = '<option value="">-- Pilih Nama --</option>';
+  sorted.forEach(n => {
+    const opt = document.createElement('option');
+    opt.value = n;
+    opt.textContent = n;
+    if (n === prev) opt.selected = true;
+    sel.appendChild(opt);
+  });
+
+  if (prev && names.has(prev)) {
+    APP.currentUser = prev;
+  }
+}
+
+function renderDashboard() {
+  const totalBeg = APP.beras.reduce((s, b) => s + Number(b.beg || 0), 0);
+  const totalKg = APP.beras.reduce((s, b) => s + Number(b.kg || 0), 0);
+  const penyumbang = new Set([...APP.beras.map(b => b.nama), ...APP.infaq.map(i => i.nama)]).size;
+
+  document.getElementById('totalBeg').textContent = totalBeg;
+  document.getElementById('totalKg').textContent = totalKg;
+  document.getElementById('totalPenyumbang').textContent = penyumbang;
+
+  // Infaq progress
+  const totalInfaq = APP.infaq.reduce((s, i) => s + Number(i.jumlah || 0), 0);
+  const target = APP.config.infaq_target || 4000;
+  const pct = Math.min(100, Math.round((totalInfaq / target) * 100));
+
+  document.getElementById('infaqCollected').textContent = 'RM' + totalInfaq.toLocaleString();
+  document.getElementById('infaqTarget').textContent = 'RM' + target.toLocaleString();
+  document.getElementById('infaqBar').style.width = pct + '%';
+  document.getElementById('infaqPct').textContent = pct + '% tercapai';
+}
+
+function renderBerasList() {
+  const tbody = document.getElementById('berasBody');
+  const table = document.getElementById('berasTable');
+  const empty = document.getElementById('berasEmpty');
+
+  if (APP.beras.length === 0) {
+    table.style.display = 'none';
+    empty.style.display = 'block';
+    return;
+  }
+
+  table.style.display = 'table';
+  empty.style.display = 'none';
+
+  let html = '';
+  let totalKg = 0;
+  let totalBeg = 0;
+
+  APP.beras.forEach((b, i) => {
+    const kg = Number(b.kg || 0);
+    const beg = Number(b.beg || 0);
+    totalKg += kg;
+    totalBeg += beg;
+
+    const isConfirmed = String(b.status || '').toLowerCase() === 'disahkan';
+    const rowClass = isConfirmed ? '' : 'belum-confirm';
+    const badge = isConfirmed
+      ? '<span class="badge badge-green">Disahkan</span>'
+      : '<span class="badge badge-yellow">Belum Confirm</span>';
+
+    let actions = '';
+    if (APP.currentUser && APP.currentUser.toLowerCase() === String(b.nama).toLowerCase()) {
+      actions += '<button class="btn-icon delete" onclick="deleteBeras(\'' + escHtml(b.nama) + '\')">Padam</button>';
+      if (!isConfirmed) {
+        actions += '<button class="btn-icon confirm" onclick="confirmBeras(\'' + escHtml(b.nama) + '\')">Sahkan</button>';
+      }
+    }
+
+    html += '<tr class="' + rowClass + '">'
+      + '<td>' + (i + 1) + '</td>'
+      + '<td><strong>' + escHtml(b.nama) + '</strong></td>'
+      + '<td>' + kg + ' kg</td>'
+      + '<td>' + beg + ' beg</td>'
+      + '<td>' + badge + '</td>'
+      + '<td><div class="action-btns">' + actions + '</div></td>'
+      + '</tr>';
+  });
+
+  // Total row
+  html += '<tr class="total-row">'
+    + '<td></td>'
+    + '<td>JUMLAH</td>'
+    + '<td>' + totalKg + ' kg</td>'
+    + '<td>' + totalBeg + ' beg</td>'
+    + '<td></td><td></td>'
+    + '</tr>';
+
+  tbody.innerHTML = html;
+}
+
+function renderInfaqList() {
+  const tbody = document.getElementById('infaqBody');
+  const table = document.getElementById('infaqTable');
+  const empty = document.getElementById('infaqEmpty');
+
+  if (APP.infaq.length === 0) {
+    table.style.display = 'none';
+    empty.style.display = 'block';
+    return;
+  }
+
+  table.style.display = 'table';
+  empty.style.display = 'none';
+
+  let html = '';
+  let total = 0;
+
+  APP.infaq.forEach((item, i) => {
+    const jumlah = Number(item.jumlah || 0);
+    total += jumlah;
+
+    let actions = '';
+    if (APP.currentUser && APP.currentUser.toLowerCase() === String(item.nama).toLowerCase()) {
+      actions += '<button class="btn-icon delete" onclick="deleteInfaq(\'' + escHtml(item.nama) + '\')">Padam</button>';
+    }
+
+    html += '<tr>'
+      + '<td>' + (i + 1) + '</td>'
+      + '<td><strong>' + escHtml(item.nama) + '</strong></td>'
+      + '<td>RM' + jumlah.toLocaleString() + '</td>'
+      + '<td><div class="action-btns">' + actions + '</div></td>'
+      + '</tr>';
+  });
+
+  // Total row
+  html += '<tr class="total-row">'
+    + '<td></td>'
+    + '<td>JUMLAH</td>'
+    + '<td>RM' + total.toLocaleString() + '</td>'
+    + '<td></td>'
+    + '</tr>';
+
+  tbody.innerHTML = html;
+}
+
+function renderForms() {
+  const berasForm = document.getElementById('berasForm');
+  const infaqForm = document.getElementById('infaqForm');
+
+  if (APP.currentUser) {
+    berasForm.classList.add('visible');
+    infaqForm.classList.add('visible');
+  } else {
+    berasForm.classList.remove('visible');
+    infaqForm.classList.remove('visible');
+  }
+}
+
+/* ═══════════════════
+   TABS
+   ═══════════════════ */
+
+function switchTab(tab) {
+  APP.activeTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.tab === tab);
+  });
+  document.getElementById('tab-beras').style.display = tab === 'beras' ? 'block' : 'none';
+  document.getElementById('tab-infaq').style.display = tab === 'infaq' ? 'block' : 'none';
+}
+
+/* ═══════════════════
+   WHATSAPP SHARE
+   ═══════════════════ */
+
+function generateWhatsAppText() {
+  const lines = [];
+
+  lines.push('*Senarai Pemberian Zakat Fitrah MFA Ramadhan 1447H* 🍚🍛');
+  lines.push('');
+
+  APP.beras.forEach((b, i) => {
+    const status = String(b.status || '').toLowerCase() === 'disahkan' ? ' ✅' : '';
+    lines.push((i + 1) + ') ' + b.nama + ' - ' + b.kg + 'kg = ' + b.beg + ' beg' + status);
+  });
+
+  const totalBeg = APP.beras.reduce((s, b) => s + Number(b.beg || 0), 0);
+  const totalKg = APP.beras.reduce((s, b) => s + Number(b.kg || 0), 0);
+  lines.push('');
+  lines.push('*Total ' + totalBeg + ' beg beras (' + totalKg + 'kg)*');
+
+  // Infaq section
+  if (APP.infaq.length > 0) {
+    const target = APP.config.infaq_target || 4000;
+    const totalInfaq = APP.infaq.reduce((s, i) => s + Number(i.jumlah || 0), 0);
+
+    lines.push('');
+    lines.push('');
+    lines.push('*Pakej Infaq (RM' + target.toLocaleString() + ')* 🥩🍳🥗🧅');
+    lines.push('');
+
+    APP.infaq.forEach((item, i) => {
+      lines.push((i + 1) + ') ' + item.nama + ' - RM' + Number(item.jumlah).toLocaleString());
+    });
+
+    lines.push('');
+    lines.push('*Jumlah kutipan: RM' + totalInfaq.toLocaleString() + '*');
+    if (totalInfaq < target) {
+      lines.push('Baki: RM' + (target - totalInfaq).toLocaleString());
+    }
+  }
+
+  return lines.join('\n');
+}
+
+function shareWhatsApp() {
+  const text = generateWhatsAppText();
+  const encoded = encodeURIComponent(text);
+  window.open('https://wa.me/?text=' + encoded, '_blank');
+}
+
+async function copyToClipboard() {
+  const text = generateWhatsAppText();
+  const btn = document.getElementById('btnCopy');
+  try {
+    await navigator.clipboard.writeText(text);
+    btn.classList.add('copied');
+    btn.innerHTML = '&#10003; Disalin!';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = '&#128203; Salin Teks';
+    }, 2000);
+  } catch (err) {
+    // Fallback
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.classList.add('copied');
+    btn.innerHTML = '&#10003; Disalin!';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = '&#128203; Salin Teks';
+    }, 2000);
+  }
+}
+
+/* ═══════════════════
+   HELPERS
+   ═══════════════════ */
+
+function updateBegPreview() {
+  const kg = Number(document.getElementById('berasKg').value) || 0;
+  const beg = kg > 0 ? Math.ceil(kg / 5) : 0;
+  document.getElementById('begPreview').textContent = '= ' + beg + ' beg';
+}
+
+function showLoading(show) {
+  ['berasLoading', 'infaqLoading'].forEach(id => {
+    document.getElementById(id).style.display = show ? 'flex' : 'none';
+  });
+}
+
+function showToast(msg, type) {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = 'toast ' + (type || 'success');
+  toast.textContent = msg;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+function escHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+/* ═══════════════════
+   INIT
+   ═══════════════════ */
+
+document.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('zakatUser');
+  if (saved) APP.currentUser = saved;
+
+  // Check if API_URL is configured
+  if (API_URL === 'MASUKKAN_DEPLOYMENT_URL_ANDA_DI_SINI') {
+    showLoading(false);
+    document.getElementById('berasEmpty').style.display = 'block';
+    document.getElementById('berasEmpty').innerHTML =
+      '<div class="emoji">&#9888;&#65039;</div>'
+      + '<strong>API belum dikonfigurasi</strong><br>'
+      + 'Sila tukar <code>API_URL</code> dalam fail ini<br>dengan Google Apps Script deployment URL anda.';
+    return;
+  }
+
+  fetchAllData();
+
+  // Auto-refresh setiap 30 saat
+  setInterval(fetchAllData, 30000);
+
+  // Refresh bila tab kembali aktif
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) fetchAllData();
+  });
+});
+</script>
+
+</body>
+</html>
