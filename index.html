@@ -572,6 +572,15 @@
             <label>Berat (KG)</label>
             <input type="number" id="berasKg" placeholder="cth: 20" inputmode="numeric" min="1" oninput="updateBegPreview()">
           </div>
+          <div class="form-group" style="max-width:120px">
+            <label>Saiz Paket</label>
+            <select id="berasSaiz" onchange="updateBegPreview()" style="width:100%;padding:10px 12px;border:1px solid var(--card-border);border-radius:var(--radius-sm);font-family:inherit;font-size:0.9rem;background:#fff;">
+              <option value="5" selected>5 kg</option>
+              <option value="1">1 kg</option>
+              <option value="2">2 kg</option>
+              <option value="10">10 kg</option>
+            </select>
+          </div>
           <div class="form-preview" id="begPreview">= 0 beg</div>
           <button class="btn-primary" onclick="submitBeras()" id="btnSubmitBeras">Hantar</button>
         </div>
@@ -586,6 +595,7 @@
               <th>#</th>
               <th>Nama</th>
               <th>KG</th>
+              <th>Saiz</th>
               <th>Beg</th>
               <th>Status</th>
               <th></th>
@@ -662,7 +672,7 @@
 /* ════════════════════════════════════════════════════════
    KONFIGURASI — Tukar API_URL dengan deployment URL anda
    ════════════════════════════════════════════════════════ */
-const API_URL = 'https://script.google.com/macros/s/AKfycbwEWKp97FPUSJTgY7GH1jtNQBPGANWSNcyn0rM7IimA67U6gVR57N7jzuTk-Y38UqDRFg/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbzeEa5DXjl84Vo2qmOZ1Svq_ku3kzAfFF-RN8fXwY46_uc-8qwXu4aZeE6oZvWNdFF1Hw/exec';
 
 /* ───── State ───── */
 const APP = {
@@ -777,10 +787,12 @@ async function submitBeras() {
   btn.disabled = true;
   btn.textContent = 'Menghantar...';
 
+  const saiz = Number(document.getElementById('berasSaiz').value) || 5;
   const result = await postData({
     action: 'addBeras',
     nama: APP.currentUser,
     kg: kg,
+    saiz: saiz,
     status: 'Belum Confirm'
   });
 
@@ -946,10 +958,13 @@ function renderBerasList() {
       }
     }
 
+    const saiz = Number(b.saiz || 5);
+
     html += '<tr class="' + rowClass + '">'
       + '<td>' + (i + 1) + '</td>'
       + '<td><strong>' + escHtml(b.nama) + '</strong></td>'
       + '<td>' + kg + ' kg</td>'
+      + '<td>' + saiz + ' kg</td>'
       + '<td>' + beg + ' beg</td>'
       + '<td>' + badge + '</td>'
       + '<td><div class="action-btns">' + actions + '</div></td>'
@@ -961,6 +976,7 @@ function renderBerasList() {
     + '<td></td>'
     + '<td>JUMLAH</td>'
     + '<td>' + totalKg + ' kg</td>'
+    + '<td></td>'
     + '<td>' + totalBeg + ' beg</td>'
     + '<td></td><td></td>'
     + '</tr>';
@@ -1051,7 +1067,8 @@ function generateWhatsAppText() {
 
   APP.beras.forEach((b, i) => {
     const status = String(b.status || '').toLowerCase() === 'disahkan' ? ' ✅' : '';
-    lines.push((i + 1) + ') ' + b.nama + ' - ' + b.kg + 'kg = ' + b.beg + ' beg' + status);
+    const saiz = Number(b.saiz || 5);
+    lines.push((i + 1) + ') ' + b.nama + ' - ' + b.kg + 'kg = ' + b.beg + ' beg (' + saiz + 'kg)' + status);
   });
 
   const totalBeg = APP.beras.reduce((s, b) => s + Number(b.beg || 0), 0);
@@ -1123,8 +1140,9 @@ async function copyToClipboard() {
 
 function updateBegPreview() {
   const kg = Number(document.getElementById('berasKg').value) || 0;
-  const beg = kg > 0 ? Math.ceil(kg / 5) : 0;
-  document.getElementById('begPreview').textContent = '= ' + beg + ' beg';
+  const saiz = Number(document.getElementById('berasSaiz').value) || 5;
+  const beg = kg > 0 ? Math.ceil(kg / saiz) : 0;
+  document.getElementById('begPreview').textContent = '= ' + beg + ' beg (' + saiz + 'kg)';
 }
 
 function showLoading(show) {
