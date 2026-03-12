@@ -1718,12 +1718,16 @@ async function submitPenerima() {
   btn.disabled = true;
   btn.textContent = 'Menghantar...';
 
-  // Preserve existing foto ID if editing without selecting new photo
+  // Preserve existing foto if editing without selecting new photo
   var existing = APP.penerima.find(function(p) { return String(p.icno) === String(icno); });
-  var fotoId = (existing && existing.foto) ? existing.foto : '';
+  var fotoValue = (existing && existing.foto) ? existing.foto : '';
 
-  // Step 1: Save penerima data via GET (without photo base64)
-  const result = await postData({
+  // If new photo captured, embed as data URL
+  if (APP.pendingPhoto) {
+    fotoValue = 'data:image/jpeg;base64,' + APP.pendingPhoto;
+  }
+
+  var payload = {
     action: 'addPenerima',
     nama: nama,
     icno: icno,
@@ -1735,20 +1739,19 @@ async function submitPenerima() {
     bilanak: document.getElementById('penAnak').value,
     jenisbantuan: document.getElementById('penBantuan').value,
     catatan: document.getElementById('penCatatan').value.trim(),
-    foto: fotoId,
+    foto: fotoValue,
     lokasi: document.getElementById('penLokasi').value,
     addedby: APP.currentUser
-  });
+  };
 
-  // Step 2: Upload photo to Google Drive via POST (no-cors) — backend links it to penerima via icno
-  if (APP.pendingPhoto && result && result.success) {
-    showToast('Memuat naik gambar ke Drive...', 'success');
-    await postDataLarge({
-      action: 'uploadPhoto',
-      base64: APP.pendingPhoto,
-      filename: 'penerima_' + icno + '_' + Date.now() + '.jpg',
-      icno: icno
-    });
+  var result;
+  if (APP.pendingPhoto) {
+    // Photo is large — use POST (no-cors) to avoid GET URL length limits
+    showToast('Menghantar data & gambar...', 'success');
+    result = await postDataLarge(payload);
+  } else {
+    // No photo — use GET for proper response feedback
+    result = await postData(payload);
   }
 
   btn.disabled = false;
