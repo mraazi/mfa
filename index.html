@@ -1729,12 +1729,7 @@ async function submitPenerima() {
   var existing = APP.penerima.find(function(p) { return String(p.icno) === String(icno); });
   var fotoValue = (existing && existing.foto) ? existing.foto : '';
 
-  // If new photo captured, embed as data URL (compressed to fit GET URL)
-  if (APP.pendingPhoto) {
-    fotoValue = APP.pendingPhoto;
-  }
-
-  // Always use GET — POST to GAS loses body due to 302 redirect
+  // Save penerima data via GET (no photo — too large for URL)
   var result = await postData({
     action: 'addPenerima',
     nama: nama,
